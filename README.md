@@ -53,23 +53,27 @@ The Home page allows users to:
 - View recommendations
 - View recent analyses
 
-### Analyze Page
+## Analyze Page
 
-The Analyze page displays:
+![Analyze Page](analyze.png)
 
-- Crime information
-- Building permit activity
-- Community activity indicators
-- Business growth information
-- Location score
+The Analyze page allows users to select a business type and neighborhood and view crime data, building permit activity, location suitability scores, and trend visualizations.
 
-### Compare Page
+---
 
-The Compare page allows users to compare two neighborhoods using charts and summary statistics.
+## Compare Page
 
-### History Page
+![Compare Page](compare.png)
 
-The History page allows users to view previously saved analyses.
+The Compare page allows users to compare two neighborhoods side-by-side using crime statistics, permit activity, and location suitability scores.
+
+---
+
+## History Page
+
+![History Page](history.png)
+
+The History page allows users to view and search previous business location analyses that have been saved to the database.
 
 ---
 
@@ -365,7 +369,7 @@ One Neighborhood can have many AnalysisHistory records.
 
 **Day:** Sunday
 
-**Time:** TBD
+**Time:** 4 pm
 
 **Format:** Microsoft Teams
 
