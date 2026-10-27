@@ -357,9 +357,9 @@ One Neighborhood can have many AnalysisHistory records.
 
 **Product Owner:** Priya Kachhia
 
-**Frontend Developer:** Alisha Rana
+**Frontend Developer:** Raj Aware
 
-**Backend / Integration Developer:** Raj Aware
+**Backend / Integration Developer:** Alisha Rana
 
 **Database Developer:** Priya Kachhia
 
