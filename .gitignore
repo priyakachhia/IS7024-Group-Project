@@ -2,3 +2,5 @@
 .vs/
 /Cincy Biz Advisor/bin/Debug/net10.0
 /Cincy Biz Advisor/obj/Debug/net10.0
+/Cincy_Biz_Advisor.Tests/bin/Debug/net10.0
+/Cincy_Biz_Advisor.Tests/obj
