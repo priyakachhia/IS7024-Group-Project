@@ -159,3 +159,7 @@ NoRequest
 `CompleteResult`, `PartialResult`, and `SourceFailure` are mutually exclusive display outcomes from `Loading`. `SourceFailure` is not a transition from `PartialResult`. The Compare page never transitions a result into a saved or calculated suitability state.
 
 `InvalidRequest` is a validation outcome before source access. `SourceFailure` is used only when no usable response is available for the comparison; if at least one measure is available, the result is `PartialResult` and each failed measure retains `SourceError`. Every displayed available measure must retain its source label and reporting period when supplied; no state may replace missing values with zero, estimates, or recalculated suitability.
+
+## Current Implementation Status
+
+The initial Compare implementation uses the canonical option, request, result, measure, and availability contracts and currently populates unavailable measures with `N/A` values. It does not yet populate verified source periods, source labels, real crime or permit totals, or an existing suitability result. Those final data-model requirements remain pending source/provider integration; no final requirement is relaxed by the initial slice.

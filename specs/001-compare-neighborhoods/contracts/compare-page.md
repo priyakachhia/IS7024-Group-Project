@@ -4,6 +4,10 @@
 
 Define the user-facing contract for the Compare Neighborhoods Razor Page. This contract assigns chart markup to the Razor page and does not prescribe a third-party charting library or source implementation.
 
+## Current Implementation Status
+
+The initial committed page implements the `/Compare` route, canonical selection form, duplicate-neighborhood validation, explicit unavailable/N/A states, three comparison result panels, a comparison table, navigation, and responsive styling. The panels are an initial presentation of the three measures; they are not yet the final source-backed server-rendered SVG charts required by this contract. The final chart, source-period, accessibility, and integrated behavior requirements remain unchanged.
+
 ## Page
 
 - **Route**: `/Compare`

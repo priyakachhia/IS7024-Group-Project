@@ -96,3 +96,7 @@ The Compare data contract is read-only. It does not expose suitability inputs, w
 ## Source Readiness and Coordination
 
 Actual source endpoints, schemas, neighborhood join keys, and suitability-provider ownership must be verified before adapters are implemented. The implementation must not infer or invent these values. Any teammate-owned suitability contract or shared source configuration requires coordination before Compare service registration or integration testing.
+
+## Current Implementation Status
+
+The initial committed implementation provides the Compare model contracts, canonical catalog, read-only provider boundary, orchestration service, and an unavailable provider. The unavailable provider returns `N/A`/unavailable states for crime, building permits, and suitability rather than fabricated values. Verified source adapters, common-period mapping, source-error mapping, and reuse of the existing suitability provider remain pending and are still governed by the contract above.

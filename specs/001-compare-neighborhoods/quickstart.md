@@ -4,6 +4,12 @@
 
 Validate the planned Compare Neighborhoods feature end to end without relying on fabricated crime, permit, or suitability values. The scenarios use the actual configured source providers and canonical option data available to the implementation environment.
 
+## Current Initial-Slice Status
+
+The committed initial Compare slice is available on `feature/compare-neighborhoods-kachhipr` under the current Cincy Biz Advisor project paths. Its selectors, duplicate-neighborhood validation, unavailable/N/A behavior, comparison panels, table, navigation, and responsive styling are implemented. The current provider intentionally has no verified crime, permit, or suitability source data, so a valid submission currently demonstrates the explicit unavailable state rather than a complete source-backed comparison.
+
+The full scenarios below remain the acceptance and integration guide. Do not mark complete-comparison, source-reuse, SVG-chart, or five-second performance outcomes based on the initial slice; those require verified providers and measured validation. The Metro Biz Advisor rename is a separate integration activity.
+
 ## Prerequisites
 
 - .NET 10 SDK installed.

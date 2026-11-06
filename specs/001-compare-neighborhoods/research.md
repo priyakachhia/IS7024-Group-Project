@@ -95,3 +95,9 @@ The repository constitution is still a placeholder template: it contains no rati
 - The project has no configured persistence. If the existing suitability result becomes available through a teammate-owned service or database later, Compare should consume its read-only contract rather than create a parallel scoring system.
 - The mockup is a visual reference only; responsive behavior and accessible chart alternatives must be validated during implementation.
 - The source schema, join-key, completeness, and suitability contract are external blockers until verified and documented by the responsible data/provider owners.
+
+## Implementation Status Note
+
+The initial Compare slice was subsequently implemented on `feature/compare-neighborhoods-kachhipr` and is no longer accurately described by the earlier repository snapshot as having no Compare page or data boundary. The current slice includes the `/Compare` Razor Page, canonical selectors, validation, a read-only provider boundary, explicit unavailable/N/A behavior, comparison panels, a results table, navigation, responsive styling, and three passing focused tests.
+
+The current provider intentionally returns unavailable values for crime, building permits, and suitability. The research decisions above remain applicable: verified source mappings, common-period rules, and the existing suitability-provider contract are still required before real-data adapters and final source-backed charts are implemented. The Metro Biz Advisor rename remains a separately coordinated project integration task and is not retroactively treated as a prerequisite for the initial slice.

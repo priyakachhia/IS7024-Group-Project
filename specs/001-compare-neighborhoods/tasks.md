@@ -4,9 +4,9 @@
 
 **Prerequisites**: `plan.md`, `spec.md`, `research.md`, `data-model.md`, `contracts/`, and `quickstart.md`
 
-**Implementation boundary**: All application tasks are limited to the Compare page and its dedicated models/services/data-source adapters after the approved Metro Biz Advisor rename. Do not modify Analyze page files, Analyze calculations, trend workflows, or suitability ownership.
+**Implementation boundary**: All application tasks are limited to the Compare page and its dedicated models/services/data-source adapters. The initial implementation may use the current Cincy Biz Advisor project structure; the full Metro Biz Advisor rename remains a separately coordinated integration task. Do not modify Analyze page files, Analyze calculations, trend workflows, or suitability ownership.
 
-**Implementation gate**: Do not create Compare application files, folders, project references, or feature code until the coordinated project-wide rename tasks T000-T000.6 are reviewed and completed. During the current planning pass, no application files or folders are renamed.
+**Implementation status**: The initial Compare application slice is complete on `feature/compare-neighborhoods-kachhipr`. Remaining source integration, suitability-provider reuse, final chart visualization, visual refinement, integrated testing, performance validation, and project-wide rename work remain pending. Task completion is recorded only where committed code or passing tests support it.
 
 ## Phase 0: Coordinated Project-Wide Rename (Blocking Prerequisite)
 
@@ -26,7 +26,7 @@
 
 The Cincy paths in the Phase 1-6 task descriptions are current repository paths recorded for planning only. After Phase 0, they must be mechanically replaced by the approved Metro Biz Advisor paths and namespaces before execution.
 
-- [ ] T001 Create the Compare source directories `Cincy Biz Advisor/Models/Compare/`, `Cincy Biz Advisor/Services/Compare/`, and `Cincy Biz Advisor/Data/Sources/` according to `specs/001-compare-neighborhoods/plan.md`.
+- [ ] T001 Create the Compare source directories `Cincy Biz Advisor/Models/Compare/`, `Cincy Biz Advisor/Services/Compare/`, and `Cincy Biz Advisor/Data/Sources/` according to `specs/001-compare-neighborhoods/plan.md`. The planned `Data/Sources/` adapter directory remains pending until real source integration.
 - [ ] T002 [P] Create the Compare test project directory using the approved Metro Biz Advisor test path and configure it to reference the renamed Metro Biz Advisor application project.
 - [ ] T003 [P] Add the Compare-specific test project to the renamed Metro Biz Advisor solution without adding or changing Analyze project references.
 - [ ] T004 Record the actual Cincinnati crime and building-permit access methods, endpoint responses, canonical neighborhood join key/normalization, reporting periods, completeness rules, source-provided total fields, and schema mappings after verification with the data owner; do not add invented fields or metric values. This task blocks source adapters and integration testing.
@@ -39,13 +39,13 @@ The Cincy paths in the Phase 1-6 task descriptions are current repository paths 
 
 **CRITICAL**: Complete this phase before user-story implementation.
 
-- [ ] T005 Define canonical option, reporting-period, availability-state, and source-metric contracts in `Cincy Biz Advisor/Models/Compare/CompareDataModels.cs`, preserving the data-model rules that identifiers are canonical, required selections are non-empty, and metric totals are never replaced with zero when absent.
-- [ ] T006 Define read-only source-provider interfaces for canonical business types, canonical neighborhoods, crime totals, permit totals, and existing suitability results in `Cincy Biz Advisor/Services/Compare/ICompareDataProviders.cs`.
+- [ ] T005 Define canonical option, reporting-period, availability-state, and source-metric contracts in `Cincy Biz Advisor/Models/Compare/CompareDataModels.cs`. Reporting-period and verified source-metric integration remain pending.
+- [ ] T006 Define read-only source-provider interfaces for canonical business types, canonical neighborhoods, crime totals, permit totals, and existing suitability results in `Cincy Biz Advisor/Services/Compare/ICompareDataProviders.cs`. Real crime, permit, and suitability providers remain pending.
 - [ ] T007 Implement source configuration binding in `Cincy Biz Advisor/Services/Compare/CompareDataOptions.cs` and `Cincy Biz Advisor/appsettings.json` without committing secrets, database credentials, or fabricated dataset records.
 - [ ] T008 Implement source adapter error mapping in `Cincy Biz Advisor/Data/Sources/CompareSourceAvailability.cs` so missing records become `Unavailable`, source read/payload failures become `SourceError`, and raw source errors are not sent to users.
-- [ ] T009 [P] Add foundational contract tests for availability-state mapping and canonical identifier rules in `Cincy Biz Advisor.Tests/CompareDataContractTests.cs`.
-- [ ] T010 [P] Add foundational service tests for canonical option filtering and distinct-neighborhood validation in `Cincy Biz Advisor.Tests/CompareSelectionValidationTests.cs`.
-- [ ] T010.1 Register the verified Compare-specific options, providers, and service in the renamed Metro Biz Advisor `Program.cs` only after source readiness and the rename gate are complete; do not alter Analyze registrations.
+- [ ] T009 [P] Add the planned foundational contract tests in `Cincy Biz Advisor.Tests/CompareDataContractTests.cs`; the current tests do not provide this exact coverage.
+- [ ] T010 [P] Add the planned foundational service tests in `Cincy Biz Advisor.Tests/CompareSelectionValidationTests.cs`; the current tests cover selected validation cases in different files.
+- [ ] T010.1 Register the verified Compare-specific options, providers, and service in the renamed Metro Biz Advisor `Program.cs` only after source readiness and the rename gate are complete; the initial unavailable registration in the current `Program.cs` does not satisfy this final task.
 
 **Checkpoint**: Source contracts, canonical selectors, error states, and test scaffolding are ready; no user story should query raw source data directly.
 
@@ -64,11 +64,11 @@ The Cincy paths in the Phase 1-6 task descriptions are current repository paths 
 
 ### Implementation for User Story 1
 
-- [ ] T013 [P] [US1] Implement canonical business-type and neighborhood option providers in `Cincy Biz Advisor/Services/Compare/CompareOptionService.cs` using only available canonical values.
-- [ ] T014 [US1] Implement comparison request validation and read-only orchestration in `Cincy Biz Advisor/Services/Compare/NeighborhoodComparisonService.cs`, requiring two different neighborhood identifiers before querying source metrics.
-- [ ] T015 [US1] Implement the Compare PageModel in `Cincy Biz Advisor/Pages/Compare.cshtml.cs` with GET option loading and POST validation/orchestration, keeping all Analyze files untouched.
-- [ ] T016 [US1] Implement the Compare selection form in `Cincy Biz Advisor/Pages/Compare.cshtml` with canonical business-type, Neighborhood A, and Neighborhood B dropdowns, a Compare action, preserved selections, and field-level validation messages.
-- [ ] T017 [US1] Add the Compare route to the existing navigation only if needed in `Cincy Biz Advisor/Pages/Shared/_Layout.cshtml`, without changing Analyze navigation or behavior.
+- [x] T013 [P] [US1] Implement the initial canonical business-type and neighborhood catalog provider in `Cincy Biz Advisor/Services/Compare/CompareCatalogProvider.cs` using the committed Compare catalog.
+- [x] T014 [US1] Implement initial comparison request validation and read-only orchestration in `Cincy Biz Advisor/Services/Compare/NeighborhoodComparisonService.cs`, including distinct-neighborhood validation.
+- [x] T015 [US1] Implement the Compare PageModel in `Cincy Biz Advisor/Pages/Compare.cshtml.cs` with GET option loading and POST validation/orchestration, keeping Analyze files untouched.
+- [x] T016 [US1] Implement the initial Compare selection form in `Cincy Biz Advisor/Pages/Compare.cshtml` with canonical dropdowns, Compare action, preserved selections, and field-level validation messages.
+- [x] T017 [US1] Add the Compare route to the existing navigation in `Cincy Biz Advisor/Pages/Shared/_Layout.cshtml`, without changing Analyze navigation or behavior.
 
 **Checkpoint**: A user can independently select valid inputs, receive clear validation for invalid inputs, and obtain a comparison context labeled with the selected business type and two neighborhoods.
 
@@ -92,8 +92,8 @@ The Cincy paths in the Phase 1-6 task descriptions are current repository paths 
 - [ ] T022 [US2] Implement the verified Cincinnati building-permit source adapter in `Cincy Biz Advisor/Data/Sources/BuildingPermitSource.cs`, mapping actual source fields to source-provided total counts for the latest complete common reporting period.
 - [ ] T023 [US2] Implement the existing suitability-result provider adapter in `Cincy Biz Advisor/Data/Sources/ExistingSuitabilitySource.cs`, returning the existing result and meaning or `Unavailable` without recalculation.
 - [ ] T024 [US2] Extend `Cincy Biz Advisor/Services/Compare/NeighborhoodComparisonService.cs` to compose exactly three `ComparisonMeasure` records and preserve reporting periods, source labels, partial-data state, and user-facing availability messages.
-- [ ] T025 [US2] Add isolated server-rendered SVG chart presentation in `Cincy Biz Advisor/Pages/Compare.cshtml`, rendering crime, building permit activity, and location suitability without domain metric calculations; keep `compare.js` out of chart ownership unless a separately approved design requires it.
-- [ ] T026 [US2] Add responsive and accessible chart styling in `Cincy Biz Advisor/wwwroot/css/site.css`, ensuring neighborhood identity is not conveyed by color alone and chart information has a text-equivalent.
+- [ ] T025 [US2] Add final source-backed server-rendered SVG chart presentation in `Cincy Biz Advisor/Pages/Compare.cshtml`; the initial implementation has comparison panels with unavailable states, not final source-backed charts.
+- [ ] T026 [US2] Complete visual chart styling and accessibility refinement. Initial responsive Compare styling exists in `Cincy Biz Advisor/wwwroot/css/compare.css`; final chart styling remains pending.
 
 **Checkpoint**: A valid comparison displays exactly three charts backed by actual source values or explicit `N/A` states, with no new suitability formula and no Analyze coupling.
 
@@ -112,8 +112,8 @@ The Cincy paths in the Phase 1-6 task descriptions are current repository paths 
 
 ### Implementation for User Story 3
 
-- [ ] T029 [US3] Implement the comparison results table in `Cincy Biz Advisor/Pages/Compare.cshtml` with Measure, Neighborhood A, Neighborhood B, and Period/source-context columns.
-- [ ] T030 [US3] Implement `N/A` and source-error table messaging in `Cincy Biz Advisor/Pages/Compare.cshtml.cs` and `Cincy Biz Advisor/Pages/Compare.cshtml`, retaining available measures and never substituting zero or estimates.
+- [ ] T029 [US3] Implement the comparison results table in `Cincy Biz Advisor/Pages/Compare.cshtml` with Measure, Neighborhood A, Neighborhood B, and Period/source-context columns. The initial table omits final period/source-context behavior.
+- [ ] T030 [US3] Implement `N/A` and source-error table messaging in `Cincy Biz Advisor/Pages/Compare.cshtml.cs` and `Cincy Biz Advisor/Pages/Compare.cshtml`, retaining available measures and never substituting zero or estimates. The initial slice verifies unavailable/N/A behavior but not final source-error mapping.
 - [ ] T031 [US3] Verify the table is the accessible text-equivalent for all three charts and remains readable for zero and large values in `Cincy Biz Advisor/Pages/Compare.cshtml` and `Cincy Biz Advisor/wwwroot/css/site.css`.
 
 **Checkpoint**: User Stories 1, 2, and 3 work together while the table remains independently verifiable and all unavailable metrics are explicit.
@@ -126,7 +126,7 @@ The Cincy paths in the Phase 1-6 task descriptions are current repository paths 
 
 - [ ] T032 [P] Add end-to-end Compare workflow tests covering valid comparison, duplicate neighborhoods, missing selections, source failure, partial data, and suitability reuse in `Cincy Biz Advisor.Tests/CompareWorkflowTests.cs`.
 - [ ] T033 [P] Add accessibility and responsive checks for labeled dropdowns, keyboard navigation, stacked narrow-screen layout, chart text alternatives, and non-color distinctions in `Cincy Biz Advisor.Tests/CompareAccessibilityTests.cs`.
-- [ ] T034 Run `dotnet build ".\Cincy Biz Advisor\Cincy Biz Advisor.csproj"` and the Compare test project; resolve only Compare-related failures in the planned files.
+- [x] T034 Run the application build and focused Compare test project; the initial implementation build passed and three focused tests passed. Final integrated validation remains pending.
 - [ ] T035 Run all scenarios in `specs/001-compare-neighborhoods/quickstart.md` against configured actual sources, recording `N/A` for missing source metrics instead of inventing expected values.
 - [ ] T036 Review the final change set to confirm no files, routes, calculations, trend workflows, or suitability ownership in Analyze were changed and no persistence or fabricated dataset was added.
 - [ ] T037 Update `specs/001-compare-neighborhoods/quickstart.md` with verified source setup and observed validation commands without adding metric fixtures or application code to the planning documents.
