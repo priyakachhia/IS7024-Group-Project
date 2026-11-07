@@ -1,6 +1,7 @@
 @page
 @model Cincy_Biz_Advisor.Pages.CompareModel
 @using Cincy_Biz_Advisor.Models.Compare
+@using System.Globalization
 @{
     ViewData["Title"] = "Compare Neighborhoods";
 }
@@ -14,7 +15,7 @@
         <p>Compare two Cincinnati neighborhoods for the same business type using available source data.</p>
     </div>
 
-    <form method="post" class="compare-form" aria-describedby="compare-help">
+    <form method="post" class="compare-form" aria-describedby="compare-help" data-compare-form>
         <p id="compare-help" class="compare-help">Choose one business type and two different neighborhoods.</p>
         <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
         <div class="compare-form-grid">
@@ -52,7 +53,10 @@
                 <span asp-validation-for="NeighborhoodBId" class="text-danger"></span>
             </div>
         </div>
-        <button type="submit" class="btn btn-primary compare-submit">Compare neighborhoods</button>
+        <button type="submit" class="btn btn-primary compare-submit" data-compare-submit>
+            <span data-compare-submit-label>Compare neighborhoods</span>
+            <span class="compare-loading" data-compare-loading hidden aria-hidden="true">Loading…</span>
+        </button>
     </form>
 
     @if (Model.Result is { } result)
@@ -78,18 +82,45 @@
                         ComparisonMeasureType.BuildingPermitActivity => "Building permit activity",
                         _ => "Location suitability"
                     };
+                    var hasAValue = decimal.TryParse(measure.NeighborhoodAValue, NumberStyles.Number, CultureInfo.InvariantCulture, out var valueA);
+                    var hasBValue = decimal.TryParse(measure.NeighborhoodBValue, NumberStyles.Number, CultureInfo.InvariantCulture, out var valueB);
+                    var maximum = Math.Max(valueA, valueB);
+                    var widthA = hasAValue && maximum > 0 ? Math.Max(8, (double)(valueA / maximum * 100)) : 0;
+                    var widthB = hasBValue && maximum > 0 ? Math.Max(8, (double)(valueB / maximum * 100)) : 0;
+                    var isAvailable = measure.Availability == ComparisonAvailability.Available && hasAValue && hasBValue;
                     <article class="compare-chart-card" aria-labelledby="chart-@measure.MeasureType">
                         <h3 id="chart-@measure.MeasureType">@heading</h3>
-                        <div class="compare-chart" role="img" aria-label="@heading comparison for @result.NeighborhoodA.Name and @result.NeighborhoodB.Name">
-                            <div class="compare-chart-value">
-                                <span>@result.NeighborhoodA.Name</span>
-                                <strong>@measure.NeighborhoodAValue</strong>
+                        @if (isAvailable)
+                        {
+                            <div class="compare-chart" role="img" aria-label="@heading comparison for @result.NeighborhoodA.Name and @result.NeighborhoodB.Name">
+                                <div class="compare-bar-group">
+                                    <div class="compare-bar-label">
+                                        <span>@result.NeighborhoodA.Name</span>
+                                        <strong>@measure.NeighborhoodAValue</strong>
+                                    </div>
+                                    <div class="compare-bar-track" aria-hidden="true">
+                                        <span class="compare-bar compare-bar-primary" style="width: @widthA.ToString("0.#", CultureInfo.InvariantCulture)%"></span>
+                                    </div>
+                                </div>
+                                <div class="compare-bar-group">
+                                    <div class="compare-bar-label">
+                                        <span>@result.NeighborhoodB.Name</span>
+                                        <strong>@measure.NeighborhoodBValue</strong>
+                                    </div>
+                                    <div class="compare-bar-track" aria-hidden="true">
+                                        <span class="compare-bar compare-bar-secondary" style="width: @widthB.ToString("0.#", CultureInfo.InvariantCulture)%"></span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="compare-chart-value">
-                                <span>@result.NeighborhoodB.Name</span>
-                                <strong>@measure.NeighborhoodBValue</strong>
+                        }
+                        else
+                        {
+                            <div class="compare-unavailable-panel" role="status">
+                                <strong>Data unavailable</strong>
+                                <span>@measure.NeighborhoodAValue</span>
+                                <span>@measure.NeighborhoodBValue</span>
                             </div>
-                        </div>
+                        }
                         @if (measure.Message is not null)
                         {
                             <p class="compare-unavailable">@measure.Message</p>
@@ -122,7 +153,10 @@
                                 <th scope="row">@heading</th>
                                 <td>@measure.NeighborhoodAValue</td>
                                 <td>@measure.NeighborhoodBValue</td>
-                                <td>@(measure.SourceLabel ?? "Source unavailable")</td>
+                                <td>
+                                    @(measure.ReportingPeriod?.DisplayLabel ?? "Period unavailable")
+                                    <span class="compare-source-label">@(measure.SourceLabel ?? "Source unavailable")</span>
+                                </td>
                             </tr>
                         }
                     </tbody>
@@ -134,4 +168,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/compare.js" asp-append-version="true"></script>
 }
