@@ -1,50 +1,52 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+
+# Metro Biz Advisor Constitution
+
+**Status:** Proposed — Pending Team Review
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Reliable and Traceable Data
+Metro Biz Advisor must use legitimate, identifiable data sources for neighborhood analysis and comparison. Crime and building permit information must come from the configured Cincinnati Open Data datasets. The application must not invent missing values. Reporting periods and unavailable data must be communicated clearly.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Modular Feature Development
+Each major feature, including Analyze and Compare, should have clearly defined responsibilities and interfaces. Shared functionality should be reused rather than duplicated. Compare should consume the existing neighborhood analysis service for crime counts, permit counts, and suitability scores.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Testable and Maintainable Code
+The application should use readable, maintainable C# code and ASP.NET Core Razor Pages conventions. New features should include relevant automated tests. Existing tests must be run after integration changes. Input validation and error handling should be included.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Collaborative Branch Development
+Team members should develop assigned features on identifiable Git branches. Pull requests should be used for code review before merging into the main branch. Cross-branch integration should be performed when features depend on one another, while preserving individual contributions and review history.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. User-Centered Design
+The application should provide an understandable and consistent experience. Neighborhood selections, business types, charts, and comparison tables must use clear labels. Missing data and invalid selections must be explained without misleading the user.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Technology and Project Constraints
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+- Framework: ASP.NET Core Razor Pages with C#.
+- Frontend: Razor views, HTML, CSS, JavaScript, and Bootstrap where appropriate.
+- Data: Cincinnati Open Data and other approved project datasets.
+- Database: MySQL for required application data storage.
+- Version Control: Git and GitHub.
+- Deployment Target: Microsoft Azure.
+- Feature documentation: Spec-Driven Development artifacts, including specifications, plans, and tasks.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+## Development Workflow and Quality Gates
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+1. Document feature requirements and acceptance criteria.
+2. Prepare an implementation plan and task breakdown.
+3. Implement features using modular services and models.
+4. Add relevant automated tests and run existing tests.
+5. Verify user-facing functionality in the application.
+6. Commit changes to the appropriate feature or integration branch.
+7. Open a pull request and request teammate review.
+8. Address review feedback before merging into main.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution documents the proposed development principles for Metro Biz Advisor.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+Changes to these principles should be discussed and approved by the project team. Pull requests should be reviewed for consistency with the agreed principles, project requirements, and testing expectations.
+
+**Version:** 1.0.0 (Proposed)
+**Ratified:** Pending team approval
+**Last Amended:** Not applicable
