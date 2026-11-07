@@ -73,7 +73,7 @@ The Compare page allows users to compare two neighborhoods side-by-side using cr
 The History page allows users to view and search previous business location analyses that have been saved to the database.
 
 ### Community Page
-![Community Page](community.png).
+![Community Discussion Page](communitydiscussion.png).
 
 The Community page lets users post and reply in a discussion board for each neighborhood and list the type of business they hope to open there. Other entrepreneurs can find them as potential partners, co-founders, or neighbors.
 
