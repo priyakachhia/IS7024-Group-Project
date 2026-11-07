@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="Cincy Biz Advisor.Tests/Cincy Biz Advisor.Tests.csproj" />
   <Project Path="Cincy Biz Advisor/Cincy Biz Advisor.csproj" />
 </Solution>
