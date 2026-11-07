@@ -7,4 +7,8 @@
     <RootNamespace>Cincy_Biz_Advisor</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\" />
+  </ItemGroup>
+
 </Project>

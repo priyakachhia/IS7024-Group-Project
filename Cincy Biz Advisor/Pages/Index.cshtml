@@ -4,7 +4,38 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="home-page">
+    <header class="home-header">
+        <h1>Analyze a Business Opportunity</h1>
+    </header>
+
+    <form id="home-primary-form" method="post" class="home-panel mx-auto text-start">
+        <div class="mb-3">
+            <label asp-for="BusinessType" class="form-label">Business type</label>
+            <select asp-for="BusinessType" class="form-select" aria-describedby="BusinessType-validation">
+                <option value="">Select a business type</option>
+                @foreach (var businessType in Model.SupportedBusinessTypes)
+                {
+                    <option value="@businessType">@businessType</option>
+                }
+            </select>
+            <span id="BusinessType-validation" asp-validation-for="BusinessType" class="validation-message"></span>
+        </div>
+
+        <div class="mb-3">
+            <label for="neighborhood-search" class="form-label">Neighborhood</label>
+            <input id="neighborhood-search" type="search" class="form-control" role="combobox" autocomplete="off" aria-autocomplete="list" aria-expanded="true" aria-controls="neighborhood-results" aria-describedby="neighborhood-status NeighborhoodId-validation" />
+            <input asp-for="NeighborhoodId" id="neighborhood-id" type="hidden" />
+            <div id="neighborhood-results" class="home-results" role="listbox" aria-label="Neighborhood results">
+                @foreach (var neighborhood in Model.AvailableNeighborhoods)
+                {
+                    <button id="neighborhood-result-@neighborhood.Id" type="button" class="home-result d-block w-100 text-start" role="option" tabindex="-1" data-neighborhood-result data-neighborhood-id="@neighborhood.Id" data-neighborhood-name="@neighborhood.Name">@neighborhood.Name</button>
+                }
+            </div>
+            <p id="neighborhood-status" role="status" aria-live="polite" aria-atomic="true"></p>
+            <span id="NeighborhoodId-validation" asp-validation-for="NeighborhoodId" class="validation-message"></span>
+        </div>
+
+        <button type="submit" class="home-submit">Analyze</button>
+    </form>
 </div>
