@@ -32,7 +32,9 @@ The goal of this project is to provide users with useful information that can he
 
 ---
 
-## Logo
+## Project Logo
+
+![MetroBiz Advisor Logo](logo.png)
 
 The logo is a single upward arrow rising out of an open circle. The circle represents a city and its neighborhoods, and the arrow represents growth and business opportunity. Using only two shapes keeps the logo readable at any size, from a browser tab icon to a page header.
 
@@ -44,6 +46,8 @@ Design revision: The Home page will lead with one primary action: choose a busin
 
 ### Home Page
 
+![MetroBiz Advisor Home Dashboard](dashboard.png)
+
 The Home page allows users to:
 
 - Select a business type
@@ -54,18 +58,22 @@ The Home page allows users to:
 - View recent analyses
 
 ### Analyze Page
+![Analyze Neighborhood Page](analyze.png)
 
 The Analyze page allows users to select a business type and neighborhood and view crime data, building permit activity, location suitability scores, and trend visualizations.
 
 ### Compare Page
 
+![Compare Neighborhoods Page](compare.png)
+
 The Compare page allows users to compare two neighborhoods side-by-side using crime statistics, permit activity, and location suitability scores.
 
 ### History Page
-
+![Analysis History Page](history.png)
 The History page allows users to view and search previous business location analyses that have been saved to the database.
 
 ### Community Page
+![Community Page](community.png).
 
 The Community page lets users post and reply in a discussion board for each neighborhood and list the type of business they hope to open there. Other entrepreneurs can find them as potential partners, co-founders, or neighbors.
 
