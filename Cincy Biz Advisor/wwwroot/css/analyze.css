@@ -1,0 +1,77 @@
+/* Styles for the Analyze page (Pages/Analyze.cshtml). Kept out of the page so there is no inline CSS. */
+
+.analyze {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 1.5rem 0;
+}
+
+.analyze-intro {
+    color: #555;
+    margin-bottom: 1.5rem;
+}
+
+.analyze-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    align-items: end;
+    margin-bottom: 2rem;
+}
+
+.analyze-actions {
+    display: flex;
+    align-items: end;
+}
+
+.analyze-actions .btn {
+    width: 100%;
+}
+
+.analyze-results h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.analyze-period {
+    color: #555;
+    margin-bottom: 1rem;
+}
+
+.analyze-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    margin: 0;
+}
+
+.analyze-stat {
+    border: 1px solid #d1d9e0;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.analyze-stat dt {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #555;
+}
+
+.analyze-stat dd {
+    font-size: 1.5rem;
+    margin: 0.25rem 0 0;
+}
+
+.analyze-stat-score {
+    border-color: #c8102e;
+}
+
+.analyze-stat-score dd {
+    color: #c8102e;
+    font-weight: 700;
+}
+
+.analyze-explanation {
+    margin-top: 1rem;
+    color: #555;
+}
