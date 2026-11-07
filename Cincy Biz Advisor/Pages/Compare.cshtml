@@ -1,0 +1,172 @@
+@page
+@model Cincy_Biz_Advisor.Pages.CompareModel
+@using Cincy_Biz_Advisor.Models.Compare
+@using System.Globalization
+@{
+    ViewData["Title"] = "Compare Neighborhoods";
+}
+
+<link rel="stylesheet" href="~/css/compare.css" asp-append-version="true" />
+
+<section class="compare-page" aria-labelledby="compare-heading">
+    <div class="compare-hero">
+        <p class="compare-eyebrow">Location planning</p>
+        <h1 id="compare-heading">Compare Neighborhoods</h1>
+        <p>Compare two Cincinnati neighborhoods for the same business type using available source data.</p>
+    </div>
+
+    <form method="post" class="compare-form" aria-describedby="compare-help" data-compare-form>
+        <p id="compare-help" class="compare-help">Choose one business type and two different neighborhoods.</p>
+        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+        <div class="compare-form-grid">
+            <div class="compare-field">
+                <label asp-for="BusinessTypeId" class="form-label">Business type</label>
+                <select asp-for="BusinessTypeId" class="form-select">
+                    <option value="">Select a business type</option>
+                    @foreach (BusinessTypeOption option in Model.BusinessTypes)
+                    {
+                        <option value="@option.Id">@option.Name</option>
+                    }
+                </select>
+                <span asp-validation-for="BusinessTypeId" class="text-danger"></span>
+            </div>
+            <div class="compare-field">
+                <label asp-for="NeighborhoodAId" class="form-label">Neighborhood A</label>
+                <select asp-for="NeighborhoodAId" class="form-select">
+                    <option value="">Select a neighborhood</option>
+                    @foreach (NeighborhoodOption option in Model.Neighborhoods)
+                    {
+                        <option value="@option.Id">@option.Name</option>
+                    }
+                </select>
+                <span asp-validation-for="NeighborhoodAId" class="text-danger"></span>
+            </div>
+            <div class="compare-field">
+                <label asp-for="NeighborhoodBId" class="form-label">Neighborhood B</label>
+                <select asp-for="NeighborhoodBId" class="form-select">
+                    <option value="">Select a neighborhood</option>
+                    @foreach (NeighborhoodOption option in Model.Neighborhoods)
+                    {
+                        <option value="@option.Id">@option.Name</option>
+                    }
+                </select>
+                <span asp-validation-for="NeighborhoodBId" class="text-danger"></span>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary compare-submit" data-compare-submit>
+            <span data-compare-submit-label>Compare neighborhoods</span>
+            <span class="compare-loading" data-compare-loading hidden aria-hidden="true">Loading…</span>
+        </button>
+    </form>
+
+    @if (Model.Result is { } result)
+    {
+        <section class="compare-results" aria-labelledby="results-heading" aria-live="polite">
+            <div class="compare-results-heading">
+                <p class="compare-eyebrow">Comparison results</p>
+                <h2 id="results-heading">@result.NeighborhoodA.Name and @result.NeighborhoodB.Name</h2>
+                <p>Business type: <strong>@result.BusinessType.Name</strong></p>
+            </div>
+
+            @if (result.Message is not null)
+            {
+                <div class="alert alert-info" role="status">@result.Message</div>
+            }
+
+            <div class="compare-charts" aria-label="Comparison charts">
+                @foreach (ComparisonMeasure measure in result.Measures)
+                {
+                    var heading = measure.MeasureType switch
+                    {
+                        ComparisonMeasureType.Crime => "Reported crime",
+                        ComparisonMeasureType.BuildingPermitActivity => "Building permit activity",
+                        _ => "Location suitability"
+                    };
+                    var hasAValue = decimal.TryParse(measure.NeighborhoodAValue, NumberStyles.Number, CultureInfo.InvariantCulture, out var valueA);
+                    var hasBValue = decimal.TryParse(measure.NeighborhoodBValue, NumberStyles.Number, CultureInfo.InvariantCulture, out var valueB);
+                    var maximum = Math.Max(valueA, valueB);
+                    var widthA = hasAValue && maximum > 0 ? Math.Max(8, (double)(valueA / maximum * 100)) : 0;
+                    var widthB = hasBValue && maximum > 0 ? Math.Max(8, (double)(valueB / maximum * 100)) : 0;
+                    var isAvailable = measure.Availability == ComparisonAvailability.Available && hasAValue && hasBValue;
+                    <article class="compare-chart-card" aria-labelledby="chart-@measure.MeasureType">
+                        <h3 id="chart-@measure.MeasureType">@heading</h3>
+                        @if (isAvailable)
+                        {
+                            <div class="compare-chart" role="img" aria-label="@heading comparison for @result.NeighborhoodA.Name and @result.NeighborhoodB.Name">
+                                <div class="compare-bar-group">
+                                    <div class="compare-bar-label">
+                                        <span>@result.NeighborhoodA.Name</span>
+                                        <strong>@measure.NeighborhoodAValue</strong>
+                                    </div>
+                                    <div class="compare-bar-track" aria-hidden="true">
+                                        <span class="compare-bar compare-bar-primary" style="width: @widthA.ToString("0.#", CultureInfo.InvariantCulture)%"></span>
+                                    </div>
+                                </div>
+                                <div class="compare-bar-group">
+                                    <div class="compare-bar-label">
+                                        <span>@result.NeighborhoodB.Name</span>
+                                        <strong>@measure.NeighborhoodBValue</strong>
+                                    </div>
+                                    <div class="compare-bar-track" aria-hidden="true">
+                                        <span class="compare-bar compare-bar-secondary" style="width: @widthB.ToString("0.#", CultureInfo.InvariantCulture)%"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="compare-unavailable-panel" role="status">
+                                <strong>Data unavailable</strong>
+                                <span>@measure.NeighborhoodAValue</span>
+                                <span>@measure.NeighborhoodBValue</span>
+                            </div>
+                        }
+                        @if (measure.Message is not null)
+                        {
+                            <p class="compare-unavailable">@measure.Message</p>
+                        }
+                    </article>
+                }
+            </div>
+
+            <div class="compare-table-wrapper">
+                <table class="table compare-table">
+                    <caption>Comparison details</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Measure</th>
+                            <th scope="col">@result.NeighborhoodA.Name</th>
+                            <th scope="col">@result.NeighborhoodB.Name</th>
+                            <th scope="col">Source context</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (ComparisonMeasure measure in result.Measures)
+                        {
+                            var heading = measure.MeasureType switch
+                            {
+                                ComparisonMeasureType.Crime => "Reported crime",
+                                ComparisonMeasureType.BuildingPermitActivity => "Building permit activity",
+                                _ => "Location suitability"
+                            };
+                            <tr>
+                                <th scope="row">@heading</th>
+                                <td>@measure.NeighborhoodAValue</td>
+                                <td>@measure.NeighborhoodBValue</td>
+                                <td>
+                                    @(measure.ReportingPeriod?.DisplayLabel ?? "Period unavailable")
+                                    <span class="compare-source-label">@(measure.SourceLabel ?? "Source unavailable")</span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    }
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/compare.js" asp-append-version="true"></script>
+}
