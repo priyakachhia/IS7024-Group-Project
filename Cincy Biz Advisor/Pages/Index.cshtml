@@ -1,41 +1,96 @@
-﻿@page
+@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Dashboard";
 }
 
 <div class="home-page">
-    <header class="home-header">
-        <h1>Analyze a Business Opportunity</h1>
-    </header>
-
-    <form id="home-primary-form" method="post" class="home-panel mx-auto text-start">
-        <div class="mb-3">
-            <label asp-for="BusinessType" class="form-label">Business type</label>
-            <select asp-for="BusinessType" class="form-select" aria-describedby="BusinessType-validation">
-                <option value="">Select a business type</option>
-                @foreach (var businessType in Model.SupportedBusinessTypes)
-                {
-                    <option value="@businessType">@businessType</option>
-                }
-            </select>
-            <span id="BusinessType-validation" asp-validation-for="BusinessType" class="validation-message"></span>
+    <section class="home-hero" aria-labelledby="home-title">
+        <div class="home-hero-content">
+            <p class="eyebrow">Available market: Cincinnati, OH</p>
+            <h1 id="home-title">Find the right location<br /><span>for your business.</span></h1>
+            <p class="hero-copy">Compare neighborhoods and make confident location decisions anywhere your business can grow.</p>
         </div>
-
-        <div class="mb-3">
-            <label for="neighborhood-search" class="form-label">Neighborhood</label>
-            <input id="neighborhood-search" type="search" class="form-control" role="combobox" autocomplete="off" aria-autocomplete="list" aria-expanded="true" aria-controls="neighborhood-results" aria-describedby="neighborhood-status NeighborhoodId-validation" />
-            <input asp-for="NeighborhoodId" id="neighborhood-id" type="hidden" />
-            <div id="neighborhood-results" class="home-results" role="listbox" aria-label="Neighborhood results">
-                @foreach (var neighborhood in Model.AvailableNeighborhoods)
-                {
-                    <button id="neighborhood-result-@neighborhood.Id" type="button" class="home-result d-block w-100 text-start" role="option" tabindex="-1" data-neighborhood-result data-neighborhood-id="@neighborhood.Id" data-neighborhood-name="@neighborhood.Name">@neighborhood.Name</button>
-                }
+        <form id="home-primary-form" method="post" class="home-panel">
+            <div class="form-field">
+                <label asp-for="BusinessType" class="form-label">Business type</label>
+                <select asp-for="BusinessType" class="form-select" aria-describedby="BusinessType-validation">
+                    <option value="">Select a business type</option>
+                    @foreach (var businessType in Model.SupportedBusinessTypes)
+                    {
+                        <option value="@businessType">@businessType</option>
+                    }
+                </select>
+                <span id="BusinessType-validation" asp-validation-for="BusinessType" class="validation-message"></span>
             </div>
-            <p id="neighborhood-status" role="status" aria-live="polite" aria-atomic="true"></p>
-            <span id="NeighborhoodId-validation" asp-validation-for="NeighborhoodId" class="validation-message"></span>
+
+            <div class="form-field neighborhood-field">
+                <label for="neighborhood-search" class="form-label">Neighborhood</label>
+                <div class="search-control">
+                    <span class="search-icon" aria-hidden="true">⌕</span>
+                    <input id="neighborhood-search" type="search" class="form-control" placeholder="Search Cincinnati neighborhoods" role="combobox" autocomplete="off" aria-autocomplete="list" aria-expanded="false" aria-controls="neighborhood-results" aria-describedby="neighborhood-status NeighborhoodId-validation" />
+                </div>
+                <input asp-for="NeighborhoodId" id="neighborhood-id" type="hidden" />
+                <div id="neighborhood-results" class="home-results" role="listbox" aria-label="Neighborhood results" hidden>
+                    @foreach (var neighborhood in Model.AvailableNeighborhoods)
+                    {
+                        <button id="neighborhood-result-@neighborhood.Id" type="button" class="home-result" role="option" tabindex="-1" data-neighborhood-result data-neighborhood-id="@neighborhood.Id" data-neighborhood-name="@neighborhood.Name">@neighborhood.Name</button>
+                    }
+                </div>
+                <p id="neighborhood-status" class="search-status" role="status" aria-live="polite" aria-atomic="true"></p>
+                <span id="NeighborhoodId-validation" asp-validation-for="NeighborhoodId" class="validation-message"></span>
+            </div>
+
+            <button type="submit" class="home-submit">Analyze Location <span aria-hidden="true">→</span></button>
+        </form>
+    </section>
+
+    <main class="home-content">
+        <section class="dashboard-section" aria-labelledby="snapshot-title">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">Cincinnati snapshot</p>
+                    <h2 id="snapshot-title">Neighborhood signals</h2>
+                </div>
+                <span class="unavailable-label">Data connection pending</span>
+            </div>
+            <div class="metric-grid">
+                <article class="metric-card"><span class="metric-icon metric-icon-green" aria-hidden="true">⌁</span><h3>Crime Score</h3><p class="empty-state">Data unavailable</p><small>Crime data source is not connected.</small></article>
+                <article class="metric-card"><span class="metric-icon metric-icon-blue" aria-hidden="true">↗</span><h3>Business Growth</h3><p class="empty-state">Data unavailable</p><small>Growth data source is not connected.</small></article>
+                <article class="metric-card"><span class="metric-icon metric-icon-violet" aria-hidden="true">✦</span><h3>Community Activity</h3><p class="empty-state">Data unavailable</p><small>Community data is out of scope for this page.</small></article>
+            </div>
+        </section>
+
+        <div class="dashboard-columns">
+            <section class="dashboard-card comparison-card" aria-labelledby="comparison-title">
+                <div class="card-heading"><div><p class="eyebrow">Compare places</p><h2 id="comparison-title">Neighborhood comparison</h2></div><span class="card-action">2 available</span></div>
+                <div class="comparison-chart" role="img" aria-label="Neighborhood comparison chart unavailable until verified neighborhood metrics are connected">
+                    <div class="chart-axis"><span>High</span><span>Medium</span><span>Low</span></div>
+                    <div class="chart-empty"><strong>Comparison data unavailable</strong><span>Verified metrics will appear here.</span></div>
+                </div>
+                <div class="neighborhood-legend">
+                    @foreach (var neighborhood in Model.AvailableNeighborhoods)
+                    {
+                        <span><i aria-hidden="true"></i>@neighborhood.Name</span>
+                    }
+                </div>
+            </section>
+
+            <section class="dashboard-card map-card" aria-labelledby="map-title">
+                <div class="card-heading"><div><p class="eyebrow">Explore locations</p><h2 id="map-title">Business density map</h2></div><span class="map-pin" aria-hidden="true">⌖</span></div>
+                <div class="map-placeholder" role="img" aria-label="Business density map unavailable until a verified business location source is connected"><span class="map-grid" aria-hidden="true"></span><strong>Map data unavailable</strong><span>Business location data is not connected.</span></div>
+            </section>
         </div>
 
-        <button type="submit" class="home-submit">Analyze</button>
-    </form>
+        <div class="dashboard-columns lower-columns">
+            <section class="dashboard-card" aria-labelledby="recommendations-title">
+                <div class="card-heading"><div><p class="eyebrow">Ideas for you</p><h2 id="recommendations-title">Recommendations</h2></div><span class="card-action">Coming soon</span></div>
+                <div class="list-empty"><span class="empty-mark" aria-hidden="true">✦</span><div><strong>No recommendations yet</strong><p>Run an analysis to receive location recommendations.</p></div></div>
+            </section>
+            <section class="dashboard-card" aria-labelledby="recent-title">
+                <div class="card-heading"><div><p class="eyebrow">Your activity</p><h2 id="recent-title">Recent analyses</h2></div><span class="card-action">History unavailable</span></div>
+                <div class="list-empty"><span class="empty-mark" aria-hidden="true">◷</span><div><strong>No recent analyses</strong><p>Saved analyses will appear here when history is connected.</p></div></div>
+            </section>
+        </div>
+    </main>
 </div>

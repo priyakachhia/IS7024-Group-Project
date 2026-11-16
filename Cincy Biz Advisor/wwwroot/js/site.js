@@ -1,11 +1,12 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
+// for details on configuring the project to bundle and minify static web assets.
 
 (() => {
     const search = document.getElementById("neighborhood-search");
     const hiddenId = document.getElementById("neighborhood-id");
     const resultsContainer = document.getElementById("neighborhood-results");
     const status = document.getElementById("neighborhood-status");
+    const globalSearch = document.getElementById("global-neighborhood-search");
 
     if (!search || !hiddenId || !resultsContainer || !status) {
         return;
@@ -38,6 +39,11 @@
         search.setAttribute("aria-activedescendant", result.id);
     };
 
+    const clearActiveResult = () => {
+        activeIndex = -1;
+        setActiveResult(null);
+    };
+
     const renderResults = () => {
         const searchText = search.value.trim().toLocaleLowerCase();
         let visibleCount = 0;
@@ -48,12 +54,10 @@
             result.hidden = !isVisible;
             if (isVisible) {
                 result.style.removeProperty("display");
+                visibleCount++;
             }
             else {
                 result.style.setProperty("display", "none", "important");
-            }
-            if (isVisible) {
-                visibleCount++;
             }
         }
 
@@ -63,25 +67,30 @@
 
         const currentVisibleResults = visibleResults();
         if (activeIndex >= currentVisibleResults.length) {
-            activeIndex = -1;
-            setActiveResult(null);
+            clearActiveResult();
         }
     };
 
     search.addEventListener("input", () => {
         hiddenId.value = "";
-        activeIndex = -1;
-        setActiveResult(null);
-        setExpanded(true);
+        clearActiveResult();
         for (const result of results) {
             result.removeAttribute("aria-selected");
         }
         renderResults();
+        setExpanded(true);
     });
 
     search.addEventListener("focus", () => setExpanded(true));
+    search.addEventListener("click", () => setExpanded(true));
 
     search.addEventListener("keydown", event => {
+        if (event.key === "Tab") {
+            setExpanded(false);
+            clearActiveResult();
+            return;
+        }
+
         const currentVisibleResults = visibleResults();
 
         if (event.key === "ArrowDown" || event.key === "ArrowUp") {
@@ -102,8 +111,7 @@
         else if (event.key === "Escape") {
             event.preventDefault();
             setExpanded(false);
-            activeIndex = -1;
-            setActiveResult(null);
+            clearActiveResult();
         }
     });
 
@@ -117,12 +125,31 @@
             }
 
             result.setAttribute("aria-selected", "true");
-            activeIndex = visibleResults().indexOf(result);
-            setActiveResult(result);
-            setExpanded(true);
             renderResults();
+            clearActiveResult();
+            setExpanded(false);
         });
     }
 
+    document.addEventListener("pointerdown", event => {
+        if (!resultsContainer.contains(event.target) && event.target !== search) {
+            setExpanded(false);
+            clearActiveResult();
+        }
+    });
+
+    globalSearch?.addEventListener("keydown", event => {
+        if (event.key !== "Enter") {
+            return;
+        }
+
+        event.preventDefault();
+        search.value = globalSearch.value;
+        search.dispatchEvent(new Event("input", { bubbles: true }));
+        search.focus();
+        setExpanded(true);
+    });
+
+    setExpanded(false);
     renderResults();
 })();
