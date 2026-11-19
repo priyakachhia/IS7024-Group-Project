@@ -29,3 +29,35 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+
+/* MetroBiz Advisor top bar */
+.metrobiz-navbar {
+    background-color: #0b1633;
+    border-bottom: 1px solid #1c2a52;
+}
+
+.metrobiz-brand {
+    color: #ffffff;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+
+    .metrobiz-brand .brand-accent {
+        color: #e53935;
+    }
+
+.metrobiz-link {
+    color: #d7def0;
+    padding-bottom: 0.4rem;
+    border-bottom: 3px solid transparent;
+}
+
+    .metrobiz-link:hover {
+        color: #ffffff;
+    }
+
+    .metrobiz-link.active {
+        color: #ffffff;
+        border-bottom-color: #e53935;
+    }

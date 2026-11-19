@@ -1,0 +1,54 @@
+openapi: 3.0.3
+info:
+  title: Neighborhood Analysis API
+  version: 1.0.0
+paths:
+  /api/neighborhoods/{name}/analysis:
+    get:
+      summary: Analyze one Cincinnati neighborhood
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema: { type: string }
+        - name: businessType
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [Restaurant, Coffee Shop, Retail]
+        - name: from
+          in: query
+          required: true
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          required: true
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: Analysis completed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/NeighborhoodAnalysisResult' }
+        '400':
+          description: Invalid business type or date range
+        '404':
+          description: Neighborhood is missing or not recognized
+        '503':
+          description: Crime or permit data is unavailable
+components:
+  schemas:
+    NeighborhoodAnalysisResult:
+      type: object
+      required: [neighborhood, businessType, from, to, crimeCount, permitCount, safety, growth, score]
+      properties:
+        neighborhood: { type: string }
+        businessType: { type: string }
+        from: { type: string, format: date }
+        to: { type: string, format: date }
+        crimeCount: { type: integer, minimum: 0 }
+        permitCount: { type: integer, minimum: 0 }
+        safety: { type: number, minimum: 0, maximum: 100 }
+        growth: { type: number, minimum: 0, maximum: 100 }
+        score: { type: integer, minimum: 0, maximum: 100 }
