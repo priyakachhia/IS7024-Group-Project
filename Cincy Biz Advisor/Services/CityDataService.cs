@@ -1,25 +1,30 @@
 using System.Globalization;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using Cincy_Biz_Advisor.Models;
 using Microsoft.Extensions.Options;
 
 namespace Cincy_Biz_Advisor.Services;
 
 /// <summary>
-/// Calls the Cincinnati Open Data (Socrata) API and asks it to COUNT matching rows,
-/// so we download one small number instead of thousands of records.
+/// Calls the Cincinnati Open Data (Socrata) API.
+/// Counts and groupings are done by the city's server, so we download a few small
+/// rows instead of thousands of records.
 ///
-/// Example request it builds:
-///   resource/7aqy-xrv9.json?$select=count(*) AS total
-///     &$where=upper(cpd_neighborhood) = 'OVER-THE-RHINE'
-///             AND date_reported >= '2025-01-01T00:00:00'
-///             AND date_reported &lt; '2026-01-01T00:00:00'
+/// Example count request:
+///   resource/t9kw-3jfx.json?$select=count(*) AS total
+///     &$where=upper(snaneighborhood) = 'OVER-THE-RHINE'
+///             AND reportdate >= '2025-01-01T00:00:00'
+///             AND reportdate &lt; '2026-01-01T00:00:00'
 /// Example response: [{"total":"412"}]
 /// </summary>
 public sealed partial class CityDataService : ICityDataService
 {
     public const string CrimeUnavailableMessage = "Crime data is currently unavailable. Please try again later.";
     public const string PermitUnavailableMessage = "Building permit data is currently unavailable. Please try again later.";
+
+    // The crime dataset column that holds the crime type, e.g. "THEFT".
+    private const string CrimeCategoryField = "starscategory";
 
     private readonly HttpClient _httpClient;
     private readonly CityDataOptions _options;
@@ -33,26 +38,34 @@ public sealed partial class CityDataService : ICityDataService
     }
 
     public Task<int> GetCrimeCountAsync(string neighborhoodQueryValue, DateOnly start, DateOnly end, CancellationToken cancellationToken = default) =>
-        GetCountAsync("crime", _options.CrimeDatasetId, _options.CrimeNeighborhoodField, _options.CrimeDateField,
-            neighborhoodQueryValue, start, end, CrimeUnavailableMessage, cancellationToken);
+        GetAsync("crime", BuildCountQuery(_options.CrimeDatasetId, _options.CrimeNeighborhoodField, _options.CrimeDateField,
+            neighborhoodQueryValue, start, end), CrimeUnavailableMessage, ParseCount, cancellationToken);
 
     public Task<int> GetPermitCountAsync(string neighborhoodQueryValue, DateOnly start, DateOnly end, CancellationToken cancellationToken = default) =>
-        GetCountAsync("building permit", _options.PermitDatasetId, _options.PermitNeighborhoodField, _options.PermitDateField,
-            neighborhoodQueryValue, start, end, PermitUnavailableMessage, cancellationToken);
+        GetAsync("building permit", BuildCountQuery(_options.PermitDatasetId, _options.PermitNeighborhoodField, _options.PermitDateField,
+            neighborhoodQueryValue, start, end), PermitUnavailableMessage, ParseCount, cancellationToken);
 
-    private async Task<int> GetCountAsync(
+    public Task<IReadOnlyList<MonthlyCount>> GetCrimeTrendAsync(string neighborhoodQueryValue, DateOnly start, DateOnly end, CancellationToken cancellationToken = default) =>
+        GetAsync("crime", BuildMonthlyQuery(_options.CrimeDatasetId, _options.CrimeNeighborhoodField, _options.CrimeDateField,
+            neighborhoodQueryValue, start, end), CrimeUnavailableMessage, ParseMonthlyCounts, cancellationToken);
+
+    public Task<IReadOnlyList<MonthlyCount>> GetPermitTrendAsync(string neighborhoodQueryValue, DateOnly start, DateOnly end, CancellationToken cancellationToken = default) =>
+        GetAsync("building permit", BuildMonthlyQuery(_options.PermitDatasetId, _options.PermitNeighborhoodField, _options.PermitDateField,
+            neighborhoodQueryValue, start, end), PermitUnavailableMessage, ParseMonthlyCounts, cancellationToken);
+
+    public Task<IReadOnlyList<CategoryCount>> GetCrimeByTypeAsync(string neighborhoodQueryValue, DateOnly start, DateOnly end, CancellationToken cancellationToken = default) =>
+        GetAsync("crime", BuildCategoryQuery(_options.CrimeDatasetId, _options.CrimeNeighborhoodField, _options.CrimeDateField,
+            neighborhoodQueryValue, start, end), CrimeUnavailableMessage, ParseCategoryCounts, cancellationToken);
+
+    /// <summary>Sends one request and turns any failure into a CityDataUnavailableException.</summary>
+    private async Task<T> GetAsync<T>(
         string datasetName,
-        string datasetId,
-        string neighborhoodField,
-        string dateField,
-        string neighborhoodQueryValue,
-        DateOnly start,
-        DateOnly end,
+        string requestUri,
         string userMessage,
+        Func<string, T> parse,
         CancellationToken cancellationToken)
     {
-        string requestUri = BuildCountQuery(datasetId, neighborhoodField, dateField, neighborhoodQueryValue, start, end);
-        _logger.LogInformation("Requesting {Dataset} count: {RequestUri}", datasetName, requestUri);
+        _logger.LogInformation("Requesting {Dataset} data: {RequestUri}", datasetName, requestUri);
 
         try
         {
@@ -67,7 +80,7 @@ public sealed partial class CityDataService : ICityDataService
                 throw new CityDataUnavailableException(datasetName, userMessage);
             }
 
-            return ParseCount(body);
+            return parse(body);
         }
         catch (HttpRequestException ex)
         {
@@ -96,6 +109,52 @@ public sealed partial class CityDataService : ICityDataService
         DateOnly start,
         DateOnly end)
     {
+        string where = BuildWhere(datasetId, neighborhoodField, dateField, neighborhoodQueryValue, start, end);
+        string select = "count(*) AS total";
+
+        return $"resource/{datasetId}.json?$select={Uri.EscapeDataString(select)}&$where={Uri.EscapeDataString(where)}";
+    }
+
+    /// <summary>Builds a query that counts rows per month: [{"month":"2025-03-01T00:00:00.000","total":"41"}, ...]</summary>
+    internal static string BuildMonthlyQuery(
+        string datasetId,
+        string neighborhoodField,
+        string dateField,
+        string neighborhoodQueryValue,
+        DateOnly start,
+        DateOnly end)
+    {
+        string where = BuildWhere(datasetId, neighborhoodField, dateField, neighborhoodQueryValue, start, end);
+        string select = $"date_trunc_ym({dateField}) AS month, count(*) AS total";
+
+        return $"resource/{datasetId}.json?$select={Uri.EscapeDataString(select)}&$where={Uri.EscapeDataString(where)}&$group=month&$order=month&$limit=1000";
+    }
+
+    /// <summary>Builds a query that counts crimes per category, largest first.</summary>
+    internal static string BuildCategoryQuery(
+        string datasetId,
+        string neighborhoodField,
+        string dateField,
+        string neighborhoodQueryValue,
+        DateOnly start,
+        DateOnly end)
+    {
+        string where = BuildWhere(datasetId, neighborhoodField, dateField, neighborhoodQueryValue, start, end);
+        string select = $"{CrimeCategoryField}, count(*) AS total";
+
+        return $"resource/{datasetId}.json?$select={Uri.EscapeDataString(select)}&$where={Uri.EscapeDataString(where)}" +
+               $"&$group={CrimeCategoryField}&$order={Uri.EscapeDataString("total DESC")}&$limit=50";
+    }
+
+    // Shared by every query: checks the inputs and builds the WHERE part.
+    private static string BuildWhere(
+        string datasetId,
+        string neighborhoodField,
+        string dateField,
+        string neighborhoodQueryValue,
+        DateOnly start,
+        DateOnly end)
+    {
         EnsureSafeIdentifier(datasetId, nameof(datasetId));
         EnsureSafeIdentifier(neighborhoodField, nameof(neighborhoodField));
         EnsureSafeIdentifier(dateField, nameof(dateField));
@@ -115,10 +174,7 @@ public sealed partial class CityDataService : ICityDataService
         string from = start.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) + "T00:00:00";
         string toExclusive = end.AddDays(1).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) + "T00:00:00";
 
-        string select = "count(*) AS total";
-        string where = $"upper({neighborhoodField}) = '{safeName}' AND {dateField} >= '{from}' AND {dateField} < '{toExclusive}'";
-
-        return $"resource/{datasetId}.json?$select={Uri.EscapeDataString(select)}&$where={Uri.EscapeDataString(where)}";
+        return $"upper({neighborhoodField}) = '{safeName}' AND {dateField} >= '{from}' AND {dateField} < '{toExclusive}'";
     }
 
     /// <summary>Reads [{"total":"412"}] and returns 412. Internal so unit tests can check it.</summary>
@@ -137,9 +193,71 @@ public sealed partial class CityDataService : ICityDataService
             return 0;
         }
 
-        if (!root[0].TryGetProperty("total", out JsonElement total))
+        return ReadTotal(root[0]);
+    }
+
+    /// <summary>Reads [{"month":"2025-03-01T00:00:00.000","total":"41"}, ...].</summary>
+    internal static IReadOnlyList<MonthlyCount> ParseMonthlyCounts(string json)
+    {
+        using JsonDocument document = JsonDocument.Parse(json);
+        JsonElement root = document.RootElement;
+
+        if (root.ValueKind != JsonValueKind.Array)
         {
-            throw new FormatException("The count query response has no 'total' field.");
+            throw new FormatException("Expected a JSON array from the monthly query.");
+        }
+
+        var months = new List<MonthlyCount>();
+        foreach (JsonElement row in root.EnumerateArray())
+        {
+            if (!row.TryGetProperty("month", out JsonElement month) || month.ValueKind != JsonValueKind.String)
+            {
+                throw new FormatException("A monthly row has no 'month' field.");
+            }
+
+            string text = month.GetString()!;
+            if (text.Length < 10)
+            {
+                throw new FormatException("A monthly row has an invalid 'month' value.");
+            }
+
+            DateOnly date = DateOnly.ParseExact(text[..10], "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            months.Add(new MonthlyCount(date, ReadTotal(row)));
+        }
+
+        return months;
+    }
+
+    /// <summary>Reads [{"starscategory":"THEFT","total":"120"}, ...].</summary>
+    internal static IReadOnlyList<CategoryCount> ParseCategoryCounts(string json)
+    {
+        using JsonDocument document = JsonDocument.Parse(json);
+        JsonElement root = document.RootElement;
+
+        if (root.ValueKind != JsonValueKind.Array)
+        {
+            throw new FormatException("Expected a JSON array from the category query.");
+        }
+
+        var categories = new List<CategoryCount>();
+        foreach (JsonElement row in root.EnumerateArray())
+        {
+            string name = row.TryGetProperty(CrimeCategoryField, out JsonElement category) && category.ValueKind == JsonValueKind.String
+                ? category.GetString()!
+                : "UNKNOWN";
+
+            categories.Add(new CategoryCount(name, ReadTotal(row)));
+        }
+
+        return categories;
+    }
+
+    // Reads the "total" field, which Socrata sends as a string ("412") or a number.
+    private static int ReadTotal(JsonElement row)
+    {
+        if (!row.TryGetProperty("total", out JsonElement total))
+        {
+            throw new FormatException("The query response has no 'total' field.");
         }
 
         return total.ValueKind switch
