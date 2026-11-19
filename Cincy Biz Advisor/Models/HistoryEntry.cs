@@ -12,9 +12,9 @@ public class HistoryEntry
 
     public int BuildingPermits { get; set; }
 
-    public int SafetyScore { get; set; }
+    public double SafetyScore { get; set; }
 
-    public int GrowthScore { get; set; }
+    public double GrowthScore { get; set; }
 
     public int OverallScore { get; set; }
 

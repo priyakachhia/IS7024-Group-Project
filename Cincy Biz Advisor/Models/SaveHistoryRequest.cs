@@ -19,10 +19,10 @@ public class SaveHistoryRequest
     public int BuildingPermits { get; set; }
 
     [Range(0, 100)]
-    public int SafetyScore { get; set; }
+    public double SafetyScore { get; set; }
 
     [Range(0, 100)]
-    public int GrowthScore { get; set; }
+    public double GrowthScore { get; set; }
 
     [Range(0, 100)]
     public int OverallScore { get; set; }
