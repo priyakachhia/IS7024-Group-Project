@@ -1,37 +1,67 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var currentPage = ViewContext.RouteData.Values["page"]?.ToString();
+    var isHomePage = currentPage == "/Index";
+    var isAnalyzePage = currentPage == "/Analyze";
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Cincy_Biz_Advisor</title>
+    <title>@ViewData["Title"] - MetroBiz Advisor</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Cincy_Biz_Advisor.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">Cincy_Biz_Advisor</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+    <header class="site-header">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm">
+            <div class="container site-nav">
+                <a class="navbar-brand brand-mark" asp-area="" asp-page="/Index" aria-label="MetroBiz Advisor home">
+                    <img src="~/images/metrobiz-logo.png" alt="" class="brand-logo" />
+                    <span>MetroBiz <strong>Advisor</strong></span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+                    <span class="navbar-toggler-icon" aria-hidden="true"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-end" id="navbarSupportedContent">
+                    <ul class="navbar-nav align-items-sm-center gap-sm-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
+                            <a class="nav-link @(isHomePage ? "active" : "")" asp-area="" asp-page="/Index"
+                               aria-current="@(isHomePage ? "page" : null)">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
+                            <a class="nav-link @(isAnalyzePage ? "active" : "")" asp-area="" asp-page="/Analyze"
+                               aria-current="@(isAnalyzePage ? "page" : null)">Analyze</a>
                         </li>
+                        <li class="nav-item">
+                            <span class="nav-link nav-unavailable" aria-disabled="true" title="Compare is not available yet">Compare</span>
+                        </li>
+                        <li class="nav-item">
+                            <span class="nav-link nav-unavailable" aria-disabled="true" title="History is not available yet">History</span>
+                        </li>
+                        @if (isHomePage)
+                        {
+                            <li class="nav-item nav-search-item">
+                                <label class="visually-hidden" for="global-neighborhood-search">Search neighborhoods</label>
+                                <div class="nav-search-control">
+                                    <span aria-hidden="true">⌕</span>
+                                    <input id="global-neighborhood-search" type="search"
+                                           placeholder="Search neighborhoods" autocomplete="off" />
+                                </div>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
+
+    <div class="container @(isHomePage ? "page-container" : "")">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
@@ -39,7 +69,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2026 - Cincy_Biz_Advisor - <a asp-area="" asp-page="/Privacy">Privacy</a>
+            &copy; 2026 - MetroBiz Advisor - <a asp-area="" asp-page="/Privacy">Privacy</a>
         </div>
     </footer>
 
