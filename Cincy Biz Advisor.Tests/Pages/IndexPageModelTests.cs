@@ -1,3 +1,4 @@
+using Cincy_Biz_Advisor.Models;
 using Cincy_Biz_Advisor.Services;
 using Cincy_Biz_Advisor.Pages;
 using Microsoft.AspNetCore.Mvc;
@@ -27,11 +28,11 @@ public sealed class IndexPageModelTests : IClassFixture<WebApplicationFactory<Pr
     }
 
     [Fact]
-    public void OnGetExposesExactlyTheSupportedBusinessTypesAndNeighborhoods()
+    public async Task OnGetExposesExactlyTheSupportedBusinessTypesAndNeighborhoods()
     {
         var pageModel = CreatePageModel();
 
-        pageModel.OnGet();
+        await pageModel.OnGetAsync(CancellationToken.None);
 
         Assert.Equal(
             ["Restaurant", "Coffee Shop", "Retail Store", "Fitness Center"],
@@ -40,24 +41,24 @@ public sealed class IndexPageModelTests : IClassFixture<WebApplicationFactory<Pr
     }
 
     [Fact]
-    public void OnPostRequiresBusinessType()
+    public async Task OnPostRequiresBusinessType()
     {
         var pageModel = CreatePageModel();
         pageModel.NeighborhoodId = 1;
 
-        var result = pageModel.OnPost();
+        var result = await pageModel.OnPostAsync(CancellationToken.None);
 
         Assert.IsType<PageResult>(result);
         Assert.NotEmpty(pageModel.ModelState[nameof(pageModel.BusinessType)]!.Errors);
     }
 
     [Fact]
-    public void OnPostRequiresNeighborhood()
+    public async Task OnPostRequiresNeighborhood()
     {
         var pageModel = CreatePageModel();
         pageModel.BusinessType = "Restaurant";
 
-        var result = pageModel.OnPost();
+        var result = await pageModel.OnPostAsync(CancellationToken.None);
 
         Assert.IsType<PageResult>(result);
         Assert.NotEmpty(pageModel.ModelState[nameof(pageModel.NeighborhoodId)]!.Errors);
@@ -66,13 +67,13 @@ public sealed class IndexPageModelTests : IClassFixture<WebApplicationFactory<Pr
     [Theory]
     [InlineData("Unsupported Business", 1)]
     [InlineData("Restaurant", 999)]
-    public void OnPostRejectsUnsupportedSubmittedValues(string businessType, int neighborhoodId)
+    public async Task OnPostRejectsUnsupportedSubmittedValues(string businessType, int neighborhoodId)
     {
         var pageModel = CreatePageModel();
         pageModel.BusinessType = businessType;
         pageModel.NeighborhoodId = neighborhoodId;
 
-        var result = pageModel.OnPost();
+        var result = await pageModel.OnPostAsync(CancellationToken.None);
 
         Assert.IsType<PageResult>(result);
         Assert.False(result is RedirectToPageResult);
@@ -81,6 +82,19 @@ public sealed class IndexPageModelTests : IClassFixture<WebApplicationFactory<Pr
 
     private static IndexModel CreatePageModel()
     {
-        return new IndexModel(new InMemoryNeighborhoodRepository());
+        return new IndexModel(new InMemoryNeighborhoodRepository(), new FakeCityDataService());
+    }
+
+    private sealed class FakeCityDataService : ICityDataService
+    {
+        public Task<int> GetCrimeCountAsync(string neighborhoodQueryValue, DateOnly start, DateOnly end, CancellationToken cancellationToken = default) => Task.FromResult(0);
+
+        public Task<int> GetPermitCountAsync(string neighborhoodQueryValue, DateOnly start, DateOnly end, CancellationToken cancellationToken = default) => Task.FromResult(0);
+
+        public Task<IReadOnlyList<MonthlyCount>> GetCrimeTrendAsync(string neighborhoodQueryValue, DateOnly start, DateOnly end, CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<MonthlyCount>>([]);
+
+        public Task<IReadOnlyList<MonthlyCount>> GetPermitTrendAsync(string neighborhoodQueryValue, DateOnly start, DateOnly end, CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<MonthlyCount>>([]);
+
+        public Task<IReadOnlyList<CategoryCount>> GetCrimeByTypeAsync(string neighborhoodQueryValue, DateOnly start, DateOnly end, CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<CategoryCount>>([]);
     }
 }

@@ -5,10 +5,17 @@ namespace Cincy_Biz_Advisor.Services;
 public sealed class InMemoryNeighborhoodRepository : INeighborhoodRepository
 {
     private static readonly IReadOnlyList<Neighborhood> Neighborhoods =
-    [
-        new Neighborhood { Id = 1, Name = "Over-the-Rhine" },
-        new Neighborhood { Id = 2, Name = "Oakley" }
-    ];
+        CincinnatiNeighborhoods.All
+            .Select((neighborhood, index) => neighborhood with
+            {
+                Id = neighborhood.DisplayName switch
+                {
+                    "Over-the-Rhine" => 1,
+                    "Oakley" => 2,
+                    _ => index + 3
+                }
+            })
+            .ToArray();
 
     public IReadOnlyList<Neighborhood> GetAvailableNeighborhoods()
     {

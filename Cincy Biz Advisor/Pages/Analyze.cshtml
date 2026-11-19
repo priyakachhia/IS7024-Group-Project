@@ -214,6 +214,55 @@
 </section>
 
 @section Scripts {
+    @if (result is not null)
+    {
+        <span id="metrobiz-completed-analysis" hidden
+              data-neighborhood="@result.Neighborhood"
+              data-business-type="@result.BusinessTypeName"
+              data-period="@($"{result.PeriodStart:MMM d, yyyy} – {result.PeriodEnd:MMM d, yyyy}")"
+              data-score="@result.SuitabilityScore"></span>
+    }
+
+    <script>
+        (() => {
+            const select = document.getElementById("Neighborhood");
+            const query = new URLSearchParams(window.location.search);
+            const suggestedName = query.get("neighborhood");
+
+            if (select && !select.value && suggestedName &&
+                Array.from(select.options).some(option => option.value === suggestedName)) {
+                select.value = suggestedName;
+            }
+
+            const marker = document.getElementById("metrobiz-completed-analysis");
+            if (!marker) return;
+
+            const { neighborhood, businessType, period, score } = marker.dataset;
+            const entry = { neighborhood, businessType, period, score: Number(score) };
+            const key = "metrobiz.recentAnalyses";
+
+            try {
+                let history;
+                try {
+                    history = JSON.parse(localStorage.getItem(key) || "[]");
+                } catch {
+                    history = [];
+                }
+
+                if (!Array.isArray(history)) history = [];
+
+                const others = history.filter(item => item &&
+                    (item.neighborhood !== neighborhood ||
+                        item.businessType !== businessType ||
+                        item.period !== period));
+
+                localStorage.setItem(key, JSON.stringify([entry, ...others].slice(0, 5)));
+            } catch {
+                // Analysis results remain visible when browser storage is unavailable.
+            }
+        })();
+    </script>
+
     <partial name="_ValidationScriptsPartial" />
 
     @if (result is not null)
@@ -221,4 +270,4 @@
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
         <script src="~/js/analyze-charts.js" asp-append-version="true"></script>
     }
-}s
+}
