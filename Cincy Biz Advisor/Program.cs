@@ -2,6 +2,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddSingleton<Cincy_Biz_Advisor.Services.Compare.ICompareCatalogProvider, Cincy_Biz_Advisor.Services.Compare.CompareCatalogProvider>();
+builder.Services.AddScoped<Cincy_Biz_Advisor.Services.Compare.ICompareDataProvider, Cincy_Biz_Advisor.Services.Compare.UnavailableCompareDataProvider>();
+builder.Services.AddScoped<Cincy_Biz_Advisor.Services.Compare.NeighborhoodComparisonService>();
 
 var app = builder.Build();
 
