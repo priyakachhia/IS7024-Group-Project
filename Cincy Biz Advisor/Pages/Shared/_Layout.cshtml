@@ -2,6 +2,7 @@
     var currentPage = ViewContext.RouteData.Values["page"]?.ToString();
     var isHomePage = currentPage == "/Index";
     var isAnalyzePage = currentPage == "/Analyze";
+    var isCommunityPage = currentPage == "/Community";
 }
 
 <!DOCTYPE html>
@@ -23,11 +24,13 @@
                     <img src="~/images/metrobiz-logo.png" alt="" class="brand-logo" />
                     <span>MetroBiz <strong>Advisor</strong></span>
                 </a>
+
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                         data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon" aria-hidden="true"></span>
                 </button>
+
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-end" id="navbarSupportedContent">
                     <ul class="navbar-nav align-items-sm-center gap-sm-1">
                         <li class="nav-item">
@@ -44,6 +47,11 @@
                         <li class="nav-item">
                             <span class="nav-link nav-unavailable" aria-disabled="true" title="History is not available yet">History</span>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(isCommunityPage ? "active" : "")" asp-area="" asp-page="/Community"
+                               aria-current="@(isCommunityPage ? "page" : null)">Community</a>
+                        </li>
+
                         @if (isHomePage)
                         {
                             <li class="nav-item nav-search-item">
