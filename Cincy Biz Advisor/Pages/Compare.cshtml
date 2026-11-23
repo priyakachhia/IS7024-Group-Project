@@ -8,6 +8,40 @@
 
 <link rel="stylesheet" href="~/css/compare.css" asp-append-version="true" />
 
+<svg class="compare-icon-sprite" aria-hidden="true" focusable="false">
+    <symbol id="compare-icon-business" viewBox="0 0 24 24">
+        <path d="M4 10.5h16M5 10.5V20h14v-9.5M3 20h18M7 10.5V5h10v5M9 8h6" />
+    </symbol>
+    <symbol id="compare-icon-utensils" viewBox="0 0 24 24">
+        <path d="M6 3v7M4 3v4a2 2 0 0 0 4 0V3M6 10v11M15 3v18M15 3c3 2 4 5 0 8" />
+    </symbol>
+    <symbol id="compare-icon-coffee" viewBox="0 0 24 24">
+        <path d="M5 8h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V8ZM16 10h2a2.5 2.5 0 0 1 0 5h-2M3 21h16M8 5c0-1 1-1 1-2M12 5c0-1 1-1 1-2" />
+    </symbol>
+    <symbol id="compare-icon-storefront" viewBox="0 0 24 24">
+        <path d="M4 10v10h16V10M3 10l2-6h14l2 6M3 10a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0M9 20v-6h6v6" />
+    </symbol>
+    <symbol id="compare-icon-location" viewBox="0 0 24 24">
+        <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" />
+        <circle cx="12" cy="10" r="2.5" />
+    </symbol>
+    <symbol id="compare-icon-shield-alert" viewBox="0 0 24 24">
+        <path d="M12 3 20 6v5c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-3Z" />
+        <path d="M12 8v4M12 15h.01" />
+    </symbol>
+    <symbol id="compare-icon-building" viewBox="0 0 24 24">
+        <path d="M4 21V4h12v17M16 9h4v12M8 8h4M8 12h4M8 16h4M18 13h1M18 17h1M2 21h20" />
+    </symbol>
+    <symbol id="compare-icon-target" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="8" />
+        <circle cx="12" cy="12" r="4" />
+        <circle cx="12" cy="12" r="1" />
+    </symbol>
+    <symbol id="compare-icon-table" viewBox="0 0 24 24">
+        <path d="M4 4h16v16H4zM4 9h16M4 14h16M10 4v16M16 4v16" />
+    </symbol>
+</svg>
+
 <section class="compare-page" aria-labelledby="compare-heading">
     <div class="compare-hero">
         <p class="compare-eyebrow">Location planning</p>
@@ -16,40 +50,55 @@
     </div>
 
     <form method="post" class="compare-form" aria-describedby="compare-help" data-compare-form>
-        <p id="compare-help" class="compare-help">Choose one business type and two different neighborhoods.</p>
+        <div class="compare-form-heading">
+            <div>
+                <p class="compare-eyebrow">Build a comparison</p>
+                <h2>Choose your locations</h2>
+            </div>
+            <p id="compare-help" class="compare-help">Choose one business type and two different neighborhoods.</p>
+        </div>
         <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
         <div class="compare-form-grid">
             <div class="compare-field">
                 <label asp-for="BusinessTypeId" class="form-label">Business type</label>
-                <select asp-for="BusinessTypeId" class="form-select">
-                    <option value="">Select a business type</option>
-                    @foreach (BusinessTypeOption option in Model.BusinessTypes)
-                    {
-                        <option value="@option.Id">@option.Name</option>
-                    }
-                </select>
+                <div class="compare-select-wrap" data-business-type-picker>
+                    <svg class="compare-field-icon" data-business-type-icon aria-hidden="true" focusable="false"><use href="#compare-icon-business"></use></svg>
+                    <select asp-for="BusinessTypeId" class="form-select">
+                        <option value="">Select a business type</option>
+                        @foreach (BusinessTypeOption option in Model.BusinessTypes)
+                        {
+                            <option value="@option.Id">@option.Name</option>
+                        }
+                    </select>
+                </div>
                 <span asp-validation-for="BusinessTypeId" class="text-danger"></span>
             </div>
             <div class="compare-field">
                 <label asp-for="NeighborhoodAId" class="form-label">Neighborhood A</label>
-                <select asp-for="NeighborhoodAId" class="form-select">
-                    <option value="">Select a neighborhood</option>
-                    @foreach (NeighborhoodOption option in Model.Neighborhoods)
-                    {
-                        <option value="@option.Id">@option.Name</option>
-                    }
-                </select>
+                <div class="compare-select-wrap">
+                    <svg class="compare-field-icon" aria-hidden="true" focusable="false"><use href="#compare-icon-location"></use></svg>
+                    <select asp-for="NeighborhoodAId" class="form-select">
+                        <option value="">Select a neighborhood</option>
+                        @foreach (NeighborhoodOption option in Model.Neighborhoods)
+                        {
+                            <option value="@option.Id">@option.Name</option>
+                        }
+                    </select>
+                </div>
                 <span asp-validation-for="NeighborhoodAId" class="text-danger"></span>
             </div>
             <div class="compare-field">
                 <label asp-for="NeighborhoodBId" class="form-label">Neighborhood B</label>
-                <select asp-for="NeighborhoodBId" class="form-select">
-                    <option value="">Select a neighborhood</option>
-                    @foreach (NeighborhoodOption option in Model.Neighborhoods)
-                    {
-                        <option value="@option.Id">@option.Name</option>
-                    }
-                </select>
+                <div class="compare-select-wrap">
+                    <svg class="compare-field-icon" aria-hidden="true" focusable="false"><use href="#compare-icon-location"></use></svg>
+                    <select asp-for="NeighborhoodBId" class="form-select">
+                        <option value="">Select a neighborhood</option>
+                        @foreach (NeighborhoodOption option in Model.Neighborhoods)
+                        {
+                            <option value="@option.Id">@option.Name</option>
+                        }
+                    </select>
+                </div>
                 <span asp-validation-for="NeighborhoodBId" class="text-danger"></span>
             </div>
         </div>
@@ -66,6 +115,7 @@
                 <p class="compare-eyebrow">Comparison results</p>
                 <h2 id="results-heading">@result.NeighborhoodA.Name and @result.NeighborhoodB.Name</h2>
                 <p>Business type: <strong>@result.BusinessType.Name</strong></p>
+                <p class="compare-summary" id="results-summary">The results below present reported crime counts, building permit activity, and location suitability using available source data for these neighborhoods. Values marked N/A or identified as unavailable were not available for comparison.</p>
             </div>
 
             @if (result.Message is not null)
@@ -73,42 +123,71 @@
                 <div class="alert alert-info" role="status">@result.Message</div>
             }
 
-            <div class="compare-charts" aria-label="Comparison charts">
+            <div class="compare-charts" aria-label="Comparison charts" aria-describedby="results-summary">
                 @foreach (ComparisonMeasure measure in result.Measures)
                 {
                     var heading = measure.MeasureType switch
                     {
-                        ComparisonMeasureType.Crime => "Reported crime",
-                        ComparisonMeasureType.BuildingPermitActivity => "Building permit activity",
-                        _ => "Location suitability"
+                        ComparisonMeasureType.Crime => "Reported Crime (Lower is Better)",
+                        ComparisonMeasureType.BuildingPermitActivity => "Building Permits",
+                        _ => "Location Suitability (Higher is Better)"
+                    };
+                    var headingIcon = measure.MeasureType switch
+                    {
+                        ComparisonMeasureType.Crime => "compare-icon-shield-alert",
+                        ComparisonMeasureType.BuildingPermitActivity => "compare-icon-building",
+                        _ => "compare-icon-target"
                     };
                     var hasAValue = decimal.TryParse(measure.NeighborhoodAValue, NumberStyles.Number, CultureInfo.InvariantCulture, out var valueA);
                     var hasBValue = decimal.TryParse(measure.NeighborhoodBValue, NumberStyles.Number, CultureInfo.InvariantCulture, out var valueB);
-                    var maximum = Math.Max(valueA, valueB);
-                    var widthA = hasAValue && maximum > 0 ? Math.Max(8, (double)(valueA / maximum * 100)) : 0;
-                    var widthB = hasBValue && maximum > 0 ? Math.Max(8, (double)(valueB / maximum * 100)) : 0;
+                    var usesSuitabilityScale = measure.MeasureType == ComparisonMeasureType.LocationSuitability;
+                    var maximum = usesSuitabilityScale ? 100m : Math.Max(valueA, valueB);
+                    maximum = maximum > 0 ? maximum : usesSuitabilityScale ? 100m : 1m;
+                    maximum = usesSuitabilityScale ? maximum : Math.Ceiling(maximum / 5m) * 5m;
+                    var tickStep = maximum / 5m;
+                    var heightA = hasAValue ? Math.Clamp((double)(valueA / maximum * 100), 0, 100) : 0;
+                    var heightB = hasBValue ? Math.Clamp((double)(valueB / maximum * 100), 0, 100) : 0;
                     var isAvailable = measure.Availability == ComparisonAvailability.Available && hasAValue && hasBValue;
-                    <article class="compare-chart-card" aria-labelledby="chart-@measure.MeasureType">
-                        <h3 id="chart-@measure.MeasureType">@heading</h3>
+                    var chartClass = measure.MeasureType switch
+                    {
+                        ComparisonMeasureType.Crime => "compare-chart-card compare-chart-card-crime",
+                        ComparisonMeasureType.BuildingPermitActivity => "compare-chart-card compare-chart-card-permits",
+                        _ => "compare-chart-card compare-chart-card-suitability"
+                    };
+                    <article class="@chartClass" aria-labelledby="chart-@measure.MeasureType">
+                        <h3 id="chart-@measure.MeasureType"><svg class="compare-heading-icon" aria-hidden="true" focusable="false"><use href="#@headingIcon"></use></svg><span>@heading</span></h3>
                         @if (isAvailable)
                         {
                             <div class="compare-chart" role="img" aria-label="@heading comparison for @result.NeighborhoodA.Name and @result.NeighborhoodB.Name">
-                                <div class="compare-bar-group">
-                                    <div class="compare-bar-label">
-                                        <span>@result.NeighborhoodA.Name</span>
-                                        <strong>@measure.NeighborhoodAValue</strong>
-                                    </div>
-                                    <div class="compare-bar-track" aria-hidden="true">
-                                        <span class="compare-bar compare-bar-primary" style="width: @widthA.ToString("0.#", CultureInfo.InvariantCulture)%"></span>
-                                    </div>
+                                <div class="compare-chart-axis" aria-hidden="true">
+                                    @for (var tick = 5; tick >= 0; tick--)
+                                    {
+                                        var tickValue = tickStep * tick;
+                                        <span>@tickValue.ToString("0.#", CultureInfo.InvariantCulture)</span>
+                                    }
                                 </div>
-                                <div class="compare-bar-group">
-                                    <div class="compare-bar-label">
-                                        <span>@result.NeighborhoodB.Name</span>
-                                        <strong>@measure.NeighborhoodBValue</strong>
+                                <div class="compare-chart-plot">
+                                    <div class="compare-chart-gridlines" aria-hidden="true">
+                                        @for (var tick = 0; tick <= 5; tick++)
+                                        {
+                                            <span style="bottom: @((tick * 20).ToString(CultureInfo.InvariantCulture))%"></span>
+                                        }
                                     </div>
-                                    <div class="compare-bar-track" aria-hidden="true">
-                                        <span class="compare-bar compare-bar-secondary" style="width: @widthB.ToString("0.#", CultureInfo.InvariantCulture)%"></span>
+                                    <div class="compare-chart-bars">
+                                        <div class="compare-chart-column">
+                                            <div class="compare-chart-bar-area" style="--bar-height: @heightA.ToString("0.#", CultureInfo.InvariantCulture)%">
+                                                <strong class="compare-chart-value">@measure.NeighborhoodAValue</strong>
+                                                <span class="compare-chart-bar" style="height: var(--bar-height)"></span>
+                                            </div>
+                                            <span class="compare-chart-label">@result.NeighborhoodA.Name</span>
+                                        </div>
+                                        <div class="compare-chart-column">
+                                            <div class="compare-chart-bar-area" style="--bar-height: @heightB.ToString("0.#", CultureInfo.InvariantCulture)%">
+                                                <strong class="compare-chart-value">@measure.NeighborhoodBValue</strong>
+                                                <span class="compare-chart-bar" style="height: var(--bar-height)"></span>
+                                            </div>
+                                            <span class="compare-chart-label">@result.NeighborhoodB.Name</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -129,9 +208,14 @@
                 }
             </div>
 
-            <div class="compare-table-wrapper">
+            <div class="compare-table-card">
+                <div class="compare-table-heading">
+                    <p class="compare-eyebrow">At a glance</p>
+                    <h3><svg class="compare-heading-icon" aria-hidden="true" focusable="false"><use href="#compare-icon-table"></use></svg><span>Comparison details</span></h3>
+                </div>
+                <div class="compare-table-wrapper">
                 <table class="table compare-table">
-                    <caption>Comparison details</caption>
+                    <caption class="visually-hidden">Comparison details for @result.NeighborhoodA.Name and @result.NeighborhoodB.Name</caption>
                     <thead>
                         <tr>
                             <th scope="col">Measure</th>
@@ -145,9 +229,9 @@
                         {
                             var heading = measure.MeasureType switch
                             {
-                                ComparisonMeasureType.Crime => "Reported crime",
-                                ComparisonMeasureType.BuildingPermitActivity => "Building permit activity",
-                                _ => "Location suitability"
+                                ComparisonMeasureType.Crime => "Reported Crime (Lower is Better)",
+                                ComparisonMeasureType.BuildingPermitActivity => "Building Permits",
+                                _ => "Location Suitability (Higher is Better)"
                             };
                             <tr>
                                 <th scope="row">@heading</th>
@@ -161,6 +245,7 @@
                         }
                     </tbody>
                 </table>
+                </div>
             </div>
         </section>
     }
