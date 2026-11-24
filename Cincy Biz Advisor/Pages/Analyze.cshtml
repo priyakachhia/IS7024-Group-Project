@@ -1,5 +1,6 @@
 @page
 @model Cincy_Biz_Advisor.Pages.AnalyzeModel
+@using System.Globalization
 @using System.Text.Json
 @using Cincy_Biz_Advisor.Models
 @{
@@ -23,6 +24,7 @@
 }
 
 <link rel="stylesheet" href="~/css/analyze.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/history.css" asp-append-version="true" />
 
 <section class="analyze" aria-labelledby="analyze-heading">
     <h1 id="analyze-heading">Analyze a Neighborhood</h1>
@@ -132,6 +134,22 @@
                             <dd>@result.SuitabilityScore / 100</dd>
                         </div>
                     </dl>
+
+                    <div class="history-save">
+                        <button type="button"
+                                id="history-save-button"
+                                class="btn btn-analyze history-save-button"
+                                data-neighborhood="@result.Neighborhood"
+                                data-business-type="@result.BusinessTypeName"
+                                data-crimes="@result.CrimeCount"
+                                data-permits="@result.PermitCount"
+                                data-safety="@result.SafetyScore.ToString(CultureInfo.InvariantCulture)"
+                                data-growth="@result.GrowthScore.ToString(CultureInfo.InvariantCulture)"
+                                data-score="@result.SuitabilityScore">
+                            Save Analysis
+                        </button>
+                        <p id="history-save-message" class="history-save-message" role="status" aria-live="polite"></p>
+                    </div>
                 }
                 else
                 {
@@ -269,5 +287,6 @@
     {
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
         <script src="~/js/analyze-charts.js" asp-append-version="true"></script>
+        <script src="~/js/history-save.js" asp-append-version="true"></script>
     }
 }

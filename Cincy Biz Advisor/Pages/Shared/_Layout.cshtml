@@ -2,6 +2,9 @@
     var currentPage = ViewContext.RouteData.Values["page"]?.ToString();
     var isHomePage = currentPage == "/Index";
     var isAnalyzePage = currentPage == "/Analyze";
+    var isComparePage = currentPage == "/Compare";
+    var isHistoryPage = currentPage == "/History";
+    var isPrivacyPage = currentPage == "/Privacy";
 }
 
 <!DOCTYPE html>
@@ -39,10 +42,16 @@
                                aria-current="@(isAnalyzePage ? "page" : null)">Analyze</a>
                         </li>
                         <li class="nav-item">
-                            <span class="nav-link nav-unavailable" aria-disabled="true" title="Compare is not available yet">Compare</span>
+                            <a class="nav-link @(isComparePage ? "active" : "")" asp-area="" asp-page="/Compare"
+                               aria-current="@(isComparePage ? "page" : null)">Compare</a>
                         </li>
                         <li class="nav-item">
-                            <span class="nav-link nav-unavailable" aria-disabled="true" title="History is not available yet">History</span>
+                            <a class="nav-link @(isHistoryPage ? "active" : "")" asp-area="" asp-page="/History"
+                               aria-current="@(isHistoryPage ? "page" : null)">History</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(isPrivacyPage ? "active" : "")" asp-area="" asp-page="/Privacy"
+                               aria-current="@(isPrivacyPage ? "page" : null)">Privacy</a>
                         </li>
                         @if (isHomePage)
                         {
