@@ -1,12 +1,14 @@
-
+using Cincy_Biz_Advisor.Data;
 using Cincy_Biz_Advisor.Models;
 using Cincy_Biz_Advisor.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddControllers();
 
 // Compare Neighborhoods services
 builder.Services.AddSingleton<
@@ -38,7 +40,21 @@ builder.Services.AddScoped<
     INeighborhoodAnalysisService,
     NeighborhoodAnalysisService>();
 
+
+// Local SQLite database for saved analysis history (created automatically).
+string historyDbPath = Path.Combine(builder.Environment.ContentRootPath, "metrobiz-history.db");
+builder.Services.AddDbContext<HistoryDbContext>(options =>
+    options.UseSqlite($"Data Source={historyDbPath}"));
+builder.Services.AddScoped<IHistoryService, HistoryService>();
+
 var app = builder.Build();
+
+// Create the history database and table on startup if they do not exist.
+using (IServiceScope scope = app.Services.CreateScope())
+{
+    HistoryDbContext db = scope.ServiceProvider.GetRequiredService<HistoryDbContext>();
+    db.Database.EnsureCreated();
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -57,5 +73,6 @@ app.UseAuthorization();
 app.MapStaticAssets();
 app.MapRazorPages()
    .WithStaticAssets();
+app.MapControllers();
 
 app.Run();
