@@ -1,0 +1,73 @@
+﻿@page
+@model Cincy_Biz_Advisor.Pages.HistoryModel
+@{
+    ViewData["Title"] = "History";
+}
+
+<link rel="stylesheet" href="~/css/history.css" asp-append-version="true" />
+
+<section class="history" aria-labelledby="history-heading">
+    <h1 id="history-heading" class="history-title">Analysis History</h1>
+    <p class="history-intro">View your previous business location analyses.</p>
+
+    <div class="history-filters">
+        <div class="history-filter">
+            <label for="history-search" class="visually-hidden">Search by neighborhood or business type</label>
+            <svg class="history-search-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <circle cx="11" cy="11" r="7" />
+                <path d="M20 20l-3.5-3.5" />
+            </svg>
+            <input id="history-search" type="search" class="history-input" placeholder="Search by neighborhood or business type..." autocomplete="off" />
+        </div>
+
+        <div class="history-filter">
+            <label for="history-type" class="visually-hidden">Business type</label>
+            <select id="history-type" class="history-select">
+                <option value="">All Business Types</option>
+            </select>
+        </div>
+
+        <div class="history-filter">
+            <label for="history-date" class="visually-hidden">Date range</label>
+            <select id="history-date" class="history-select">
+                <option value="all">All Dates</option>
+                <option value="7">Last 7 days</option>
+                <option value="30">Last 30 days</option>
+                <option value="year">This year</option>
+            </select>
+        </div>
+    </div>
+
+    <p id="history-status" class="history-status" role="status" aria-live="polite">Loading saved analyses...</p>
+    <p id="history-error" class="history-error" role="alert" hidden></p>
+
+    <div id="history-results" hidden>
+        <p id="history-empty" class="history-empty" role="status" hidden>No saved analyses found</p>
+
+        <div id="history-table-wrapper" class="history-table-wrapper">
+            <table class="history-table">
+                <caption class="visually-hidden">Saved neighborhood analyses</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Business Type</th>
+                        <th scope="col">Neighborhood</th>
+                        <th scope="col" class="history-num">Reported Crimes</th>
+                        <th scope="col" class="history-num">Building Permits</th>
+                        <th scope="col" class="history-num">Location Suitability</th>
+                    </tr>
+                </thead>
+                <tbody id="history-table-body"></tbody>
+            </table>
+        </div>
+
+        <div id="history-footer" class="history-footer">
+            <p id="history-summary" class="history-summary" aria-live="polite"></p>
+            <nav id="history-pager" class="history-pager" aria-label="History pages"></nav>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/history-list.js" asp-append-version="true"></script>
+}
