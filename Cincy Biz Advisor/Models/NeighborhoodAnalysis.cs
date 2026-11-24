@@ -25,5 +25,14 @@ public sealed record NeighborhoodAnalysis
     /// <summary>0–100. Safety and growth combined using the business type's weights.</summary>
     public required int SuitabilityScore { get; init; }
 
+    /// <summary>Crimes per month in the period (for the trend chart).</summary>
+    public IReadOnlyList<MonthlyCount> CrimeTrend { get; init; } = [];
+
+    /// <summary>Permits issued per month in the period (for the trend chart).</summary>
+    public IReadOnlyList<MonthlyCount> PermitTrend { get; init; } = [];
+
+    /// <summary>Crimes grouped by category (for the donut chart).</summary>
+    public IReadOnlyList<CategoryCount> CrimeByType { get; init; } = [];
+
     public string BusinessTypeName => BusinessType.ToDisplayName();
 }

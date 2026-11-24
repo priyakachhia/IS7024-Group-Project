@@ -1,8 +1,25 @@
 @page
 @model Cincy_Biz_Advisor.Pages.AnalyzeModel
+@using System.Text.Json
 @using Cincy_Biz_Advisor.Models
 @{
     ViewData["Title"] = "Analyze a Neighborhood";
+    var result = Model.Result;
+
+    // Chart data is written into the page as JSON; the default encoder escapes < > & so it is safe inside a script tag.
+    string chartJson = "{}";
+    if (result is not null)
+    {
+        chartJson = JsonSerializer.Serialize(new
+        {
+            crimeLabels = result.CrimeTrend.Select(m => m.Month.ToString("MMM yyyy")),
+            crimeValues = result.CrimeTrend.Select(m => m.Count),
+            permitLabels = result.PermitTrend.Select(m => m.Month.ToString("MMM yyyy")),
+            permitValues = result.PermitTrend.Select(m => m.Count),
+            typeLabels = result.CrimeByType.Select(c => c.Category),
+            typeValues = result.CrimeByType.Select(c => c.Count)
+        });
+    }
 }
 
 <link rel="stylesheet" href="~/css/analyze.css" asp-append-version="true" />
@@ -13,86 +30,195 @@
         Pick a neighborhood and a business type to see recent crime, building activity, and a suitability score.
     </p>
 
-    <form method="post" class="analyze-form">
-        <div class="analyze-field">
-            <label asp-for="Neighborhood" class="form-label"></label>
-            <select asp-for="Neighborhood" class="form-select" aria-describedby="neighborhood-error">
-                <option value="">Select a neighborhood</option>
-                @foreach (Neighborhood neighborhood in Model.Neighborhoods)
+    <div class="analyze-layout">
+        <section class="analyze-panel" aria-labelledby="options-heading">
+            <h2 id="options-heading">1. Select Options</h2>
+
+            <form method="post" class="analyze-form">
+                <div class="analyze-field">
+                    <label asp-for="Neighborhood" class="form-label"></label>
+                    <div class="analyze-select">
+                        <svg class="analyze-field-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round">
+                            <path d="M12 21s-7-6.2-7-11a7 7 0 1 1 14 0c0 4.8-7 11-7 11z" />
+                            <circle cx="12" cy="10" r="2.5" />
+                        </svg>
+                        <select asp-for="Neighborhood" class="form-select" aria-describedby="neighborhood-error">
+                            <option value="">Select a neighborhood</option>
+                            @foreach (Neighborhood neighborhood in Model.Neighborhoods)
+                            {
+                                <option value="@neighborhood.DisplayName">@neighborhood.DisplayName</option>
+                            }
+                        </select>
+                    </div>
+                    <span asp-validation-for="Neighborhood" id="neighborhood-error" class="text-danger" role="alert"></span>
+                </div>
+
+                <div class="analyze-field">
+                    <label asp-for="BusinessType" class="form-label"></label>
+                    <div class="analyze-select">
+                        <svg class="analyze-field-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round">
+                            <rect x="3" y="7" width="18" height="13" rx="2" />
+                            <path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18" />
+                        </svg>
+                        <select asp-for="BusinessType" asp-items="Html.GetEnumSelectList<BusinessType>()" class="form-select"></select>
+                    </div>
+                </div>
+
+                <div class="analyze-dates">
+                    <div class="analyze-field">
+                        <label asp-for="From" class="form-label"></label>
+                        <input asp-for="From" class="form-control" />
+                    </div>
+
+                    <div class="analyze-field">
+                        <label asp-for="To" class="form-label"></label>
+                        <input asp-for="To" class="form-control" aria-describedby="to-error" />
+                        <span asp-validation-for="To" id="to-error" class="text-danger" role="alert"></span>
+                    </div>
+                </div>
+
+                <div class="analyze-actions">
+                    <button type="submit" class="btn btn-analyze">Analyze</button>
+                </div>
+            </form>
+        </section>
+
+        <div class="analyze-output" aria-live="polite">
+            @if (Model.ErrorMessage is not null)
+            {
+                <div class="alert alert-danger analyze-alert" role="alert">@Model.ErrorMessage</div>
+            }
+
+            <section class="analyze-panel" aria-labelledby="results-heading">
+                <h2 id="results-heading">2. Analysis Results</h2>
+
+                @if (result is not null)
                 {
-                    <option value="@neighborhood.DisplayName">@neighborhood.DisplayName</option>
+                    <p class="analyze-subtitle">@result.Neighborhood | @result.BusinessTypeName</p>
+                    <p class="analyze-period">
+                        @result.PeriodStart.ToString("MMMM d, yyyy") – @result.PeriodEnd.ToString("MMMM d, yyyy")
+                    </p>
+
+                    <dl class="analyze-stats">
+                        <div class="analyze-stat analyze-stat-crime">
+                            <dt>
+                                <svg class="analyze-stat-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round">
+                                    <path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z" />
+                                </svg>
+                                Reported Crimes
+                            </dt>
+                            <dd>@result.CrimeCount</dd>
+                        </div>
+                        <div class="analyze-stat analyze-stat-permits">
+                            <dt>
+                                <svg class="analyze-stat-icon" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
+                                    <rect x="3" y="12" width="4" height="8" rx="1" />
+                                    <rect x="10" y="6" width="4" height="14" rx="1" />
+                                    <rect x="17" y="9" width="4" height="11" rx="1" />
+                                </svg>
+                                Building Permits
+                            </dt>
+                            <dd>@result.PermitCount</dd>
+                        </div>
+                        <div class="analyze-stat analyze-stat-score">
+                            <dt>
+                                <svg class="analyze-stat-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="9" />
+                                    <circle cx="12" cy="12" r="5" />
+                                    <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+                                </svg>
+                                Suitability Score
+                            </dt>
+                            <dd>@result.SuitabilityScore / 100</dd>
+                        </div>
+                    </dl>
                 }
-            </select>
-            <span asp-validation-for="Neighborhood" id="neighborhood-error" class="text-danger" role="alert"></span>
-        </div>
-
-        <div class="analyze-field">
-            <label asp-for="BusinessType" class="form-label"></label>
-            <select asp-for="BusinessType" asp-items="Html.GetEnumSelectList<BusinessType>()" class="form-select"></select>
-        </div>
-
-        <div class="analyze-field">
-            <label asp-for="From" class="form-label"></label>
-            <input asp-for="From" class="form-control" />
-        </div>
-
-        <div class="analyze-field">
-            <label asp-for="To" class="form-label"></label>
-            <input asp-for="To" class="form-control" aria-describedby="to-error" />
-            <span asp-validation-for="To" id="to-error" class="text-danger" role="alert"></span>
-        </div>
-
-        <div class="analyze-actions">
-            <button type="submit" class="btn btn-primary">Analyze</button>
-        </div>
-    </form>
-
-    <div class="analyze-output" aria-live="polite">
-        @if (Model.ErrorMessage is not null)
-        {
-            <div class="alert alert-danger" role="alert">@Model.ErrorMessage</div>
-        }
-
-        @if (Model.Result is NeighborhoodAnalysis result)
-        {
-            <section class="analyze-results" aria-labelledby="results-heading">
-                <h2 id="results-heading">Results</h2>
-                <p class="analyze-period">
-                    @result.PeriodStart.ToString("MMMM d, yyyy") – @result.PeriodEnd.ToString("MMMM d, yyyy")
-                </p>
-
-                <dl class="analyze-stats">
-                    <div class="analyze-stat">
-                        <dt>Neighborhood</dt>
-                        <dd>@result.Neighborhood</dd>
-                    </div>
-                    <div class="analyze-stat">
-                        <dt>Business Type</dt>
-                        <dd>@result.BusinessTypeName</dd>
-                    </div>
-                    <div class="analyze-stat">
-                        <dt>Reported Crimes</dt>
-                        <dd>@result.CrimeCount</dd>
-                    </div>
-                    <div class="analyze-stat">
-                        <dt>Building Permits</dt>
-                        <dd>@result.PermitCount</dd>
-                    </div>
-                    <div class="analyze-stat analyze-stat-score">
-                        <dt>Suitability Score</dt>
-                        <dd>@result.SuitabilityScore / 100</dd>
-                    </div>
-                </dl>
-
-                <p class="analyze-explanation">
-                    Safety score @result.SafetyScore.ToString("0.#") and growth score @result.GrowthScore.ToString("0.#"),
-                    weighted for a @result.BusinessTypeName.ToLowerInvariant().
-                </p>
+                else
+                {
+                    <p class="analyze-placeholder">Choose a neighborhood and click Analyze to see results.</p>
+                }
             </section>
-        }
+
+            <section class="analyze-panel" aria-labelledby="insights-heading">
+                <h2 id="insights-heading" class="analyze-title-with-icon">
+                    <svg class="analyze-title-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <circle cx="12" cy="12" r="4" />
+                        <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" />
+                    </svg>
+                    Key Insights
+                </h2>
+
+                @if (result is not null)
+                {
+                    <ul class="analyze-insights">
+                        <li class="analyze-insight-safety">
+                            <svg class="analyze-insight-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round">
+                                <path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z" />
+                            </svg>
+                            <span>Safety score <strong>@result.SafetyScore.ToString("0.#") / 100</strong>, based on @result.CrimeCount reported crimes.</span>
+                        </li>
+                        <li class="analyze-insight-growth">
+                            <svg class="analyze-insight-icon" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
+                                <rect x="3" y="12" width="4" height="8" rx="1" />
+                                <rect x="10" y="6" width="4" height="14" rx="1" />
+                                <rect x="17" y="9" width="4" height="11" rx="1" />
+                            </svg>
+                            <span>Growth score <strong>@result.GrowthScore.ToString("0.#") / 100</strong>, based on @result.PermitCount building permits issued.</span>
+                        </li>
+                        <li class="analyze-insight-score">
+                            <svg class="analyze-insight-icon" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9L12 2.5z" />
+                            </svg>
+                            <span>Weighted for a @result.BusinessTypeName.ToLowerInvariant(), the suitability score is <strong>@result.SuitabilityScore / 100</strong>.</span>
+                        </li>
+                    </ul>
+                }
+                else
+                {
+                    <p class="analyze-placeholder">Insights appear here after you run an analysis.</p>
+                }
+            </section>
+
+            @if (result is not null)
+            {
+                <div class="analyze-charts">
+                    <section class="analyze-panel" aria-labelledby="crime-trend-heading">
+                        <h2 id="crime-trend-heading">Crime Incidents Trend</h2>
+                        <div class="analyze-chart-box">
+                            <canvas id="analyzeCrimeTrend" role="img" aria-label="Bar chart of reported crimes per month for @result.Neighborhood"></canvas>
+                        </div>
+                    </section>
+
+                    <section class="analyze-panel" aria-labelledby="permit-trend-heading">
+                        <h2 id="permit-trend-heading">Building Permits Trend</h2>
+                        <div class="analyze-chart-box">
+                            <canvas id="analyzePermitTrend" role="img" aria-label="Bar chart of building permits issued per month for @result.Neighborhood"></canvas>
+                        </div>
+                    </section>
+
+                    <section class="analyze-panel" aria-labelledby="crime-type-heading">
+                        <h2 id="crime-type-heading">Crime Incidents by Type</h2>
+                        <div class="analyze-chart-box">
+                            <canvas id="analyzeCrimeType" role="img" aria-label="Donut chart of reported crimes by type for @result.Neighborhood"></canvas>
+                        </div>
+                    </section>
+                </div>
+            }
+        </div>
     </div>
+
+    @if (result is not null)
+    {
+        <script type="application/json" id="analyze-chart-data">@Html.Raw(chartJson)</script>
+    }
 </section>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-}
+
+    @if (result is not null)
+    {
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+        <script src="~/js/analyze-charts.js" asp-append-version="true"></script>
+    }
+}s
