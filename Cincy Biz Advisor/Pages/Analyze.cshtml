@@ -1,0 +1,98 @@
+@page
+@model Cincy_Biz_Advisor.Pages.AnalyzeModel
+@using Cincy_Biz_Advisor.Models
+@{
+    ViewData["Title"] = "Analyze a Neighborhood";
+}
+
+<link rel="stylesheet" href="~/css/analyze.css" asp-append-version="true" />
+
+<section class="analyze" aria-labelledby="analyze-heading">
+    <h1 id="analyze-heading">Analyze a Neighborhood</h1>
+    <p class="analyze-intro">
+        Pick a neighborhood and a business type to see recent crime, building activity, and a suitability score.
+    </p>
+
+    <form method="post" class="analyze-form">
+        <div class="analyze-field">
+            <label asp-for="Neighborhood" class="form-label"></label>
+            <select asp-for="Neighborhood" class="form-select" aria-describedby="neighborhood-error">
+                <option value="">Select a neighborhood</option>
+                @foreach (Neighborhood neighborhood in Model.Neighborhoods)
+                {
+                    <option value="@neighborhood.DisplayName">@neighborhood.DisplayName</option>
+                }
+            </select>
+            <span asp-validation-for="Neighborhood" id="neighborhood-error" class="text-danger" role="alert"></span>
+        </div>
+
+        <div class="analyze-field">
+            <label asp-for="BusinessType" class="form-label"></label>
+            <select asp-for="BusinessType" asp-items="Html.GetEnumSelectList<BusinessType>()" class="form-select"></select>
+        </div>
+
+        <div class="analyze-field">
+            <label asp-for="From" class="form-label"></label>
+            <input asp-for="From" class="form-control" />
+        </div>
+
+        <div class="analyze-field">
+            <label asp-for="To" class="form-label"></label>
+            <input asp-for="To" class="form-control" aria-describedby="to-error" />
+            <span asp-validation-for="To" id="to-error" class="text-danger" role="alert"></span>
+        </div>
+
+        <div class="analyze-actions">
+            <button type="submit" class="btn btn-primary">Analyze</button>
+        </div>
+    </form>
+
+    <div class="analyze-output" aria-live="polite">
+        @if (Model.ErrorMessage is not null)
+        {
+            <div class="alert alert-danger" role="alert">@Model.ErrorMessage</div>
+        }
+
+        @if (Model.Result is NeighborhoodAnalysis result)
+        {
+            <section class="analyze-results" aria-labelledby="results-heading">
+                <h2 id="results-heading">Results</h2>
+                <p class="analyze-period">
+                    @result.PeriodStart.ToString("MMMM d, yyyy") – @result.PeriodEnd.ToString("MMMM d, yyyy")
+                </p>
+
+                <dl class="analyze-stats">
+                    <div class="analyze-stat">
+                        <dt>Neighborhood</dt>
+                        <dd>@result.Neighborhood</dd>
+                    </div>
+                    <div class="analyze-stat">
+                        <dt>Business Type</dt>
+                        <dd>@result.BusinessTypeName</dd>
+                    </div>
+                    <div class="analyze-stat">
+                        <dt>Reported Crimes</dt>
+                        <dd>@result.CrimeCount</dd>
+                    </div>
+                    <div class="analyze-stat">
+                        <dt>Building Permits</dt>
+                        <dd>@result.PermitCount</dd>
+                    </div>
+                    <div class="analyze-stat analyze-stat-score">
+                        <dt>Suitability Score</dt>
+                        <dd>@result.SuitabilityScore / 100</dd>
+                    </div>
+                </dl>
+
+                <p class="analyze-explanation">
+                    Safety score @result.SafetyScore.ToString("0.#") and growth score @result.GrowthScore.ToString("0.#"),
+                    weighted for a @result.BusinessTypeName.ToLowerInvariant().
+                </p>
+            </section>
+        }
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
