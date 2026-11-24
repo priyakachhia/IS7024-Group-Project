@@ -1,25 +1,27 @@
 namespace Cincy_Biz_Advisor.Models;
 
 /// <summary>
-/// A Cincinnati neighborhood shown in the dropdown.
+/// A Cincinnati neighborhood used by the Home picker and the city data service.
 /// </summary>
-/// <param name="DisplayName">The name users see, for example "Over-the-Rhine".</param>
+/// <param name="DisplayName">The neighborhood name shown to users.</param>
 /// <param name="DatasetName">
-/// Optional: the exact name used in the city datasets, if it is spelled differently
-/// from the display name. Leave null when the names match (case does not matter).
+/// The exact name used by the city datasets when it differs from the display name.
 /// </param>
 public sealed record Neighborhood(string DisplayName, string? DatasetName = null)
 {
-    /// <summary>The value sent to the city API. Compared in uppercase, so case does not matter.</summary>
+    public Neighborhood() : this(string.Empty) { }
+
+    public int Id { get; init; }
+
+    public string Name
+    {
+        get => DisplayName;
+        init => DisplayName = value;
+    }
+
     public string QueryValue => (DatasetName ?? DisplayName).ToUpperInvariant();
 }
 
-/// <summary>
-/// The neighborhoods users can pick from.
-/// If a neighborhood always returns 0 crimes and 0 permits, its spelling probably
-/// differs in the city data. Check the exact name (see docs/STEP_BY_STEP.md) and
-/// set DatasetName.
-/// </summary>
 public static class CincinnatiNeighborhoods
 {
     public static IReadOnlyList<Neighborhood> All { get; } = new List<Neighborhood>
@@ -45,9 +47,9 @@ public static class CincinnatiNeighborhoods
         new("Westwood")
     };
 
-    /// <summary>Finds a neighborhood by its display name, ignoring case. Returns null if not found.</summary>
     public static Neighborhood? Find(string? displayName) =>
         string.IsNullOrWhiteSpace(displayName)
             ? null
-            : All.FirstOrDefault(n => string.Equals(n.DisplayName, displayName.Trim(), StringComparison.OrdinalIgnoreCase));
+            : All.FirstOrDefault(n =>
+                string.Equals(n.DisplayName, displayName.Trim(), StringComparison.OrdinalIgnoreCase));
 }

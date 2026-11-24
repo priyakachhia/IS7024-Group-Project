@@ -6,9 +6,9 @@ using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddControllers();
+builder.Services.AddSingleton<INeighborhoodRepository, InMemoryNeighborhoodRepository>();
 
 // Compare Neighborhoods services
 builder.Services.AddSingleton<
@@ -76,3 +76,5 @@ app.MapRazorPages()
 app.MapControllers();
 
 app.Run();
+
+public partial class Program;

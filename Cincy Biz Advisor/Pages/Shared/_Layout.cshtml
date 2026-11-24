@@ -1,4 +1,13 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var currentPage = ViewContext.RouteData.Values["page"]?.ToString();
+    var isHomePage = currentPage == "/Index";
+    var isAnalyzePage = currentPage == "/Analyze";
+    var isComparePage = currentPage == "/Compare";
+    var isHistoryPage = currentPage == "/History";
+    var isPrivacyPage = currentPage == "/Privacy";
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -10,40 +19,58 @@
     <link rel="stylesheet" href="~/Cincy_Biz_Advisor.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        @{
-            var currentPage = ViewContext.RouteData.Values["page"]?.ToString();
-        }
-        <nav class="navbar navbar-expand-sm navbar-dark metrobiz-navbar mb-3">
-            <div class="container">
-                <a class="navbar-brand metrobiz-brand" asp-area="" asp-page="/Index">MetroBiz <span class="brand-accent">Advisor</span></a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+    <header class="site-header">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm">
+            <div class="container site-nav">
+                <a class="navbar-brand brand-mark" asp-area="" asp-page="/Index" aria-label="MetroBiz Advisor home">
+                    <img src="~/images/metrobiz-logo.png" alt="" class="brand-logo" />
+                    <span>MetroBiz <strong>Advisor</strong></span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+                    <span class="navbar-toggler-icon" aria-hidden="true"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-end" id="navbarSupportedContent">
+                    <ul class="navbar-nav align-items-sm-center gap-sm-1">
                         <li class="nav-item">
-                            <a class="nav-link metrobiz-link @(currentPage == "/Index" ? "active" : "")" asp-area="" asp-page="/Index">Home</a>
+                            <a class="nav-link @(isHomePage ? "active" : "")" asp-area="" asp-page="/Index"
+                               aria-current="@(isHomePage ? "page" : null)">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link metrobiz-link @(currentPage == "/Analyze" ? "active" : "")" asp-area="" asp-page="/Analyze">Analyze</a>
+                            <a class="nav-link @(isAnalyzePage ? "active" : "")" asp-area="" asp-page="/Analyze"
+                               aria-current="@(isAnalyzePage ? "page" : null)">Analyze</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link metrobiz-link @(currentPage == "/History" ? "active" : "")" asp-area="" asp-page="/History">History</a>
+                            <a class="nav-link @(isComparePage ? "active" : "")" asp-area="" asp-page="/Compare"
+                               aria-current="@(isComparePage ? "page" : null)">Compare</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link metrobiz-link @(currentPage == "/Privacy" ? "active" : "")" asp-area="" asp-page="/Privacy">Privacy</a>
+                            <a class="nav-link @(isHistoryPage ? "active" : "")" asp-area="" asp-page="/History"
+                               aria-current="@(isHistoryPage ? "page" : null)">History</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Compare">Compare</a>
+                            <a class="nav-link @(isPrivacyPage ? "active" : "")" asp-area="" asp-page="/Privacy"
+                               aria-current="@(isPrivacyPage ? "page" : null)">Privacy</a>
                         </li>
+                        @if (isHomePage)
+                        {
+                            <li class="nav-item nav-search-item">
+                                <label class="visually-hidden" for="global-neighborhood-search">Search neighborhoods</label>
+                                <div class="nav-search-control">
+                                    <span aria-hidden="true">⌕</span>
+                                    <input id="global-neighborhood-search" type="search"
+                                           placeholder="Search neighborhoods" autocomplete="off" />
+                                </div>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
+
+    <div class="container @(isHomePage ? "page-container" : "")">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
