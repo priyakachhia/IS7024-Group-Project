@@ -1,0 +1,181 @@
+﻿@page
+@model CommunityModel
+@using Cincy_Biz_Advisor.Models
+
+@{
+    ViewData["Title"] = "Community";
+}
+
+<div class="container py-4">
+    <h1 class="fw-bold">Community</h1>
+    <p class="text-muted mb-4">
+        Share business ideas and connect with potential partners, co-founders, and neighbors.
+    </p>
+
+    <div class="row g-3">
+        <aside class="col-12 col-md-3" aria-label="Discussion filters">
+            <div class="card p-3">
+                <button type="button" class="btn btn-danger w-100 mb-3"
+                        data-bs-toggle="modal" data-bs-target="#new-post-modal">
+                    + New Post
+                </button>
+
+                <label for="community-neighborhood" class="form-label">Neighborhood</label>
+                <select id="community-neighborhood" class="form-select mb-3">
+                    <option value="">All neighborhoods</option>
+                    @foreach (var neighborhood in CincinnatiNeighborhoods.All)
+                    {
+                        <option value="@neighborhood.DisplayName">@neighborhood.DisplayName</option>
+                    }
+                </select>
+
+                <label for="community-business" class="form-label">Business type</label>
+                <select id="community-business" class="form-select">
+                    <option value="">All business types</option>
+                    @foreach (var businessType in Model.BusinessTypes)
+                    {
+                        <option value="@businessType">@businessType</option>
+                    }
+                </select>
+            </div>
+        </aside>
+
+        <div class="col-12 col-md-9">
+            <section class="card p-4 mb-3" aria-labelledby="discussions-heading">
+                <h2 id="discussions-heading" class="h5">Discussions</h2>
+
+                @if (Model.Posts.Count == 0)
+                {
+                    <p class="text-muted mb-0">No discussions yet.</p>
+                }
+                else
+                {
+                    foreach (var post in Model.Posts)
+                    {
+                        <article class="border-bottom py-3">
+                            <h3 class="h5 mb-1 text-break">@post.Title</h3>
+                            <p class="small text-muted mb-2">
+                                @post.Neighborhood · @post.BusinessType · @post.Category
+                            </p>
+                            <p class="mb-0 text-break" style="white-space: pre-wrap;">@post.Message</p>
+                        </article>
+                    }
+                }
+            </section>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="new-post-modal" tabindex="-1"
+     aria-labelledby="new-post-heading" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <form method="post" asp-page-handler="Preview" class="modal-content">
+            <div class="modal-header">
+                <h2 id="new-post-heading" class="modal-title h5">Write a post</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label asp-for="Draft.Title" class="form-label">Title</label>
+                    <input asp-for="Draft.Title" class="form-control"
+                           maxlength="120" aria-describedby="post-title-error" />
+                    <span asp-validation-for="Draft.Title"
+                          id="post-title-error" class="text-danger"></span>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <label asp-for="Draft.Neighborhood" class="form-label">Neighborhood</label>
+                        <select asp-for="Draft.Neighborhood" class="form-select"
+                                aria-describedby="post-neighborhood-error">
+                            <option value="">Select a neighborhood</option>
+                            @foreach (var neighborhood in CincinnatiNeighborhoods.All)
+                            {
+                                <option value="@neighborhood.DisplayName">@neighborhood.DisplayName</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Draft.Neighborhood"
+                              id="post-neighborhood-error" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="Draft.BusinessType" class="form-label">Business type</label>
+                        <select asp-for="Draft.BusinessType" class="form-select"
+                                aria-describedby="post-business-error">
+                            <option value="">Select a business type</option>
+                            @foreach (var businessType in Model.BusinessTypes)
+                            {
+                                <option value="@businessType">@businessType</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Draft.BusinessType"
+                              id="post-business-error" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="Draft.Category" class="form-label">Category</label>
+                        <select asp-for="Draft.Category" class="form-select"
+                                aria-describedby="post-category-error">
+                            <option value="">Select a category</option>
+                            @foreach (var category in Model.Categories)
+                            {
+                                <option value="@category">@category</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Draft.Category"
+                              id="post-category-error" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Draft.Message" class="form-label">Message</label>
+                    <textarea asp-for="Draft.Message" class="form-control" rows="5"
+                              maxlength="2000" aria-describedby="post-message-error"></textarea>
+                    <span asp-validation-for="Draft.Message"
+                          id="post-message-error" class="text-danger"></span>
+                </div>
+
+                @if (Model.ShowPreview)
+                {
+                    <article class="border rounded bg-light p-3" aria-labelledby="post-preview-heading">
+                        <h3 id="post-preview-heading" class="h6" tabindex="-1">Post preview</h3>
+                        <p class="fw-bold mb-1 text-break">@Model.Draft.Title</p>
+                        <p class="small text-muted mb-2">
+                            @Model.Draft.Neighborhood · @Model.Draft.BusinessType · @Model.Draft.Category
+                        </p>
+                        <p class="mb-0 text-break" style="white-space: pre-wrap;">@Model.Draft.Message</p>
+                    </article>
+                }
+            </div>
+
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-danger">Preview post</button>
+
+                @if (Model.CanPublish)
+                {
+                    <button type="submit" asp-page-handler="Publish" class="btn btn-primary">
+                        Publish post
+                    </button>
+                }
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @if (Model.ShowPreview || !ViewData.ModelState.IsValid)
+    {
+        <script>
+            const postModal = document.getElementById("new-post-modal");
+
+            postModal.addEventListener("shown.bs.modal", function() {
+                const feedback = postModal.querySelector(".input-validation-error, #post-preview-heading");
+                feedback?.focus();
+            }, { once: true });
+
+            bootstrap.Modal.getOrCreateInstance(postModal).show();
+        </script>
+    }
+}

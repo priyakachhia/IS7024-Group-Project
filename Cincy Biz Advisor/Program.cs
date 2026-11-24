@@ -10,6 +10,20 @@ builder.Services.AddRazorPages();
 builder.Services.AddControllers();
 builder.Services.AddSingleton<INeighborhoodRepository, InMemoryNeighborhoodRepository>();
 
+if (builder.Environment.IsDevelopment())
+{
+    var communityDataFolder = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "MetroBizAdvisor");
+
+    Directory.CreateDirectory(communityDataFolder);
+
+    var communityDatabasePath = Path.Combine(communityDataFolder, "community.db");
+
+    builder.Services.AddDbContext<CommunityDbContext>(options =>
+        options.UseSqlite($"Data Source={communityDatabasePath}"));
+}
+
 // Compare Neighborhoods services
 builder.Services.AddSingleton<
     Cincy_Biz_Advisor.Services.Compare.ICompareCatalogProvider,
@@ -57,7 +71,13 @@ using (IServiceScope scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var communityDb = scope.ServiceProvider.GetRequiredService<CommunityDbContext>();
+    communityDb.Database.EnsureCreated();
+}
+else
 {
     app.UseExceptionHandler("/Error");
     // The default HSTS value is 30 days.
