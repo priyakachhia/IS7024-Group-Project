@@ -1,0 +1,537 @@
+.compare-page {
+  --compare-navy: #102a43;
+  --compare-navy-dark: #071d33;
+  --compare-red: #c6283d;
+  --compare-red-dark: #9f1f31;
+  --compare-ink: #263746;
+  --compare-muted: #52677a;
+  --compare-border: #dce5eb;
+  --compare-surface: #f7fafc;
+  --compare-soft-red: #fff3f4;
+  max-width: none;
+  margin: 0;
+  padding: 2rem 0 4rem;
+  color: var(--compare-ink);
+}
+
+.compare-icon-sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+body:has(.compare-page) > .container {
+  max-width: none;
+  padding-right: clamp(1.5rem, 3vw, 2.5rem);
+  padding-left: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.compare-hero,
+.compare-results-heading {
+  margin-bottom: 2rem;
+}
+
+.compare-hero {
+  max-width: 760px;
+}
+
+.compare-hero h1,
+.compare-results-heading h2 {
+  margin-bottom: .65rem;
+  color: var(--compare-navy-dark);
+  font-weight: 750;
+  letter-spacing: -.025em;
+}
+
+.compare-hero h1 {
+  font-size: clamp(2.625rem, 4vw, 3rem);
+  line-height: 1.1;
+}
+
+.compare-hero > p:last-child,
+.compare-results-heading > p:not(.compare-eyebrow) {
+  max-width: 720px;
+  margin-bottom: 0;
+  color: var(--compare-muted);
+  font-size: 1.05rem;
+  line-height: 1.65;
+}
+
+.compare-eyebrow {
+  margin-bottom: .35rem;
+  color: var(--compare-red);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.compare-form {
+  padding: 2rem;
+  border: 1px solid var(--compare-border);
+  border-top: 4px solid var(--compare-red);
+  border-radius: 1rem;
+  background: var(--compare-surface);
+  box-shadow: 0 .75rem 2rem rgba(20, 45, 70, .07);
+}
+
+.compare-form-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.compare-form-heading h2 {
+  margin: 0;
+  color: var(--compare-navy-dark);
+  font-size: 1.35rem;
+}
+
+.compare-form-heading .compare-eyebrow {
+  margin-bottom: .25rem;
+}
+
+.compare-help {
+  max-width: 340px;
+  margin: 0;
+  color: var(--compare-muted);
+  font-size: .95rem;
+  line-height: 1.5;
+}
+
+.compare-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.compare-field {
+  min-width: 0;
+}
+
+.compare-field .form-label {
+  margin-bottom: .5rem;
+  color: var(--compare-navy-dark);
+  font-size: .9rem;
+  font-weight: 700;
+}
+
+.compare-field .form-select {
+  min-height: 3rem;
+  padding-left: 3rem;
+  border-color: #c9d6df;
+  border-radius: .55rem;
+  color: var(--compare-ink);
+}
+
+.compare-select-wrap {
+  position: relative;
+}
+
+.compare-field-icon {
+  position: absolute;
+  top: 50%;
+  left: 1rem;
+  z-index: 1;
+  width: 1.15rem;
+  height: 1.15rem;
+  transform: translateY(-50%);
+  fill: none;
+  stroke: var(--compare-navy);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+  pointer-events: none;
+}
+
+.compare-field .form-select:focus {
+  border-color: var(--compare-red);
+  box-shadow: 0 0 0 .2rem rgba(198, 40, 61, .16);
+}
+
+.compare-field .text-danger,
+.compare-form > .text-danger {
+  display: block;
+  margin-top: .45rem;
+  font-size: .85rem;
+}
+
+.compare-submit {
+  min-width: 12rem;
+  margin-top: 1.5rem;
+  padding: .8rem 1.25rem;
+  border-color: var(--compare-red-dark);
+  border-radius: .55rem;
+  background: var(--compare-red);
+  font-weight: 700;
+  letter-spacing: .01em;
+  transition: background-color .15s ease, border-color .15s ease, transform .15s ease;
+}
+
+.compare-submit:hover,
+.compare-submit:focus {
+  border-color: var(--compare-red-dark);
+  background: var(--compare-red-dark);
+}
+
+.compare-submit:hover {
+  transform: translateY(-1px);
+}
+
+.compare-submit:focus-visible,
+.compare-table a:focus-visible {
+  outline: 3px solid rgba(198, 40, 61, .3);
+  outline-offset: 3px;
+}
+
+.compare-submit[aria-busy="true"] {
+  cursor: wait;
+  opacity: .8;
+}
+
+.compare-results {
+  margin-top: 3.5rem;
+}
+
+.compare-results-heading {
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--compare-border);
+}
+
+.compare-summary {
+  margin-top: 1.25rem !important;
+  padding: 1rem 1.15rem;
+  border-left: 4px solid var(--compare-red);
+  background: var(--compare-soft-red);
+  color: var(--compare-ink) !important;
+  font-size: .95rem !important;
+  line-height: 1.6 !important;
+}
+
+.compare-charts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1.75rem 0 2rem;
+}
+
+.compare-chart-card {
+  min-width: 0;
+  padding: 1.5rem;
+  border: 1px solid var(--compare-border);
+  border-radius: .85rem;
+  background: #fff;
+  box-shadow: 0 .5rem 1.25rem rgba(20, 45, 70, .07);
+  transition: box-shadow .15s ease, transform .15s ease;
+}
+
+.compare-chart-card-crime {
+  --chart-color: #c6283d;
+}
+
+.compare-chart-card-permits {
+  --chart-color: #2f6da1;
+}
+
+.compare-chart-card-suitability {
+  --chart-color: #2e8b57;
+}
+
+.compare-chart-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 .8rem 1.5rem rgba(20, 45, 70, .1);
+}
+
+.compare-chart-card h3 {
+  display: flex;
+  align-items: flex-start;
+  gap: .55rem;
+  margin: 0;
+  color: var(--compare-navy-dark);
+  font-size: 1.1rem;
+  line-height: 1.35;
+}
+
+.compare-heading-icon {
+  flex: 0 0 auto;
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-top: .12rem;
+  fill: none;
+  stroke: var(--compare-navy);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.compare-chart {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  gap: .65rem;
+  margin-top: 1.25rem;
+}
+
+.compare-chart-axis {
+  display: flex;
+  height: 220px;
+  flex-direction: column;
+  justify-content: space-between;
+  color: var(--compare-muted);
+  font-size: .72rem;
+  line-height: 1;
+  text-align: right;
+}
+
+.compare-chart-plot {
+  position: relative;
+  min-width: 0;
+}
+
+.compare-chart-gridlines {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 220px;
+}
+
+.compare-chart-gridlines span {
+  position: absolute;
+  right: 0;
+  left: 0;
+  border-top: 1px solid #dfe7ec;
+}
+
+.compare-chart-bars {
+  position: relative;
+  display: flex;
+  align-items: start;
+  justify-content: space-evenly;
+  gap: 1.5rem;
+  height: 270px;
+}
+
+.compare-chart-column {
+  z-index: 1;
+  display: grid;
+  grid-template-rows: 220px auto;
+  width: min(7rem, 42%);
+  height: 270px;
+  align-items: end;
+  justify-items: center;
+}
+
+.compare-chart-bar-area {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 220px;
+  align-items: end;
+  justify-content: center;
+}
+
+.compare-chart-value {
+  position: absolute;
+  bottom: calc(var(--bar-height) + .4rem);
+  z-index: 2;
+  margin: 0;
+  color: var(--compare-navy-dark);
+  font-size: .85rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.compare-chart-bar {
+  width: min(4.5rem, 70%);
+  min-height: 0;
+  border-radius: .35rem .35rem 0 0;
+  background: var(--chart-color);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .04);
+}
+
+.compare-chart-label {
+  display: block;
+  width: 100%;
+  padding-top: .55rem;
+  overflow-wrap: anywhere;
+  color: var(--compare-ink);
+  font-size: .78rem;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.compare-chart-card-crime .compare-chart-bar {
+  background: #c6283d;
+}
+
+.compare-chart-card-permits .compare-chart-bar {
+  background: #2f6da1;
+}
+
+.compare-chart-card-suitability .compare-chart-bar {
+  background: #2e8b57;
+}
+
+.compare-chart-card-crime .compare-chart-value {
+  color: #a51f33;
+}
+
+.compare-chart-card-permits .compare-chart-value {
+  color: #255a85;
+}
+
+.compare-chart-card-suitability .compare-chart-value {
+  color: #267346;
+}
+
+.compare-unavailable-panel {
+  display: grid;
+  gap: .35rem;
+  min-height: 7rem;
+  align-content: center;
+  padding: 1rem;
+  border: 1px dashed #c6d3dc;
+  border-radius: .5rem;
+  color: var(--compare-muted);
+  text-align: center;
+}
+
+.compare-unavailable-panel strong {
+  color: var(--compare-navy);
+}
+
+.compare-unavailable {
+  margin: 1rem 0 0;
+  color: var(--compare-muted);
+  font-size: .9rem;
+}
+
+.compare-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--compare-border);
+  border-radius: .75rem;
+}
+
+.compare-table-card {
+  padding: 1.5rem;
+  border: 1px solid var(--compare-border);
+  border-radius: .85rem;
+  background: #fff;
+  box-shadow: 0 .5rem 1.25rem rgba(20, 45, 70, .06);
+}
+
+.compare-table-heading {
+  margin-bottom: 1rem;
+}
+
+.compare-table-heading .compare-eyebrow {
+  margin-bottom: .25rem;
+}
+
+.compare-table-heading h3 {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  margin-bottom: 0;
+  color: var(--compare-navy-dark);
+  font-size: 1.25rem;
+}
+
+.compare-table {
+  min-width: 680px;
+  margin-bottom: 0;
+}
+
+.compare-table caption {
+  color: var(--compare-navy);
+  font-weight: 700;
+  text-align: left;
+}
+
+.compare-table thead th {
+  border-bottom: 2px solid var(--compare-navy);
+  background: var(--compare-navy);
+  color: #fff;
+  font-size: .85rem;
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
+
+.compare-table tbody th {
+  color: var(--compare-navy-dark);
+  font-weight: 700;
+}
+
+.compare-table tbody tr:nth-child(even) {
+  background: #f8fafc;
+}
+
+.compare-table tbody tr:hover {
+  background: var(--compare-soft-red);
+}
+
+.compare-table td,
+.compare-table th {
+  vertical-align: middle;
+}
+
+.compare-source-label {
+  display: block;
+  color: var(--compare-muted);
+  font-size: .8rem;
+}
+
+.compare-loading {
+  margin-left: .35rem;
+}
+
+@media (max-width: 767.98px) {
+  .compare-form-grid,
+  .compare-charts {
+    grid-template-columns: 1fr;
+  }
+
+  .compare-page {
+    padding: 1.25rem 0 3rem;
+  }
+
+  body:has(.compare-page) > .container {
+    padding-right: .75rem;
+    padding-left: .75rem;
+  }
+
+  .compare-form {
+    padding: 1.25rem;
+  }
+
+  .compare-form-heading {
+    display: block;
+  }
+
+  .compare-help {
+    margin-top: .75rem;
+  }
+
+  .compare-submit {
+    width: 100%;
+  }
+
+  .compare-table-card {
+    padding: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .compare-submit,
+  .compare-chart-card {
+    transition: none;
+  }
+
+  .compare-submit:hover,
+  .compare-chart-card:hover {
+    transform: none;
+  }
+}
