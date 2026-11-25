@@ -10,19 +10,39 @@ builder.Services.AddRazorPages();
 builder.Services.AddControllers();
 builder.Services.AddSingleton<INeighborhoodRepository, InMemoryNeighborhoodRepository>();
 
-if (builder.Environment.IsDevelopment())
+var sqlConnection = builder.Configuration.GetConnectionString("MetroBizAdvisor");
+var useSqlServer = !string.IsNullOrWhiteSpace(sqlConnection);
+if (useSqlServer)
 {
-    var communityDataFolder = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "MetroBizAdvisor");
-
-    Directory.CreateDirectory(communityDataFolder);
-
-    var communityDatabasePath = Path.Combine(communityDataFolder, "community.db");
-
-    builder.Services.AddDbContext<CommunityDbContext>(options =>
-        options.UseSqlite($"Data Source={communityDatabasePath}"));
+    builder.Services.AddDbContext<HistoryDbContext>(options => options.UseSqlServer(sqlConnection));
+    builder.Services.AddDbContext<CommunityDbContext>(options => options.UseSqlServer(sqlConnection));
 }
+else
+{
+    if (!string.IsNullOrWhiteSpace(builder.Configuration["WEBSITE_SITE_NAME"]))
+    {
+        throw new InvalidOperationException(
+            "Set the MetroBizAdvisor connection string in Azure App Service before starting the app.");
+    }
+
+    var historyDbPath = Path.Combine(builder.Environment.ContentRootPath, "metrobiz-history.db");
+    builder.Services.AddDbContext<HistoryDbContext>(options =>
+        options.UseSqlite($"Data Source={historyDbPath}"));
+
+    if (builder.Environment.IsDevelopment())
+    {
+        var communityDataFolder = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "MetroBizAdvisor");
+
+        Directory.CreateDirectory(communityDataFolder);
+        var communityDatabasePath = Path.Combine(communityDataFolder, "community.db");
+        builder.Services.AddDbContext<CommunityDbContext>(options =>
+            options.UseSqlite($"Data Source={communityDatabasePath}"));
+    }
+}
+
+builder.Services.AddScoped<IHistoryService, HistoryService>();
 
 // Compare Neighborhoods services
 builder.Services.AddSingleton<
@@ -54,30 +74,21 @@ builder.Services.AddScoped<
     INeighborhoodAnalysisService,
     NeighborhoodAnalysisService>();
 
-
-// Local SQLite database for saved analysis history (created automatically).
-string historyDbPath = Path.Combine(builder.Environment.ContentRootPath, "metrobiz-history.db");
-builder.Services.AddDbContext<HistoryDbContext>(options =>
-    options.UseSqlite($"Data Source={historyDbPath}"));
-builder.Services.AddScoped<IHistoryService, HistoryService>();
-
 var app = builder.Build();
 
-// Create the history database and table on startup if they do not exist.
-using (IServiceScope scope = app.Services.CreateScope())
+// Azure SQL tables are provisioned by deploy/azure-sql-schema.sql.
+if (!useSqlServer)
 {
-    HistoryDbContext db = scope.ServiceProvider.GetRequiredService<HistoryDbContext>();
-    db.Database.EnsureCreated();
+    using var scope = app.Services.CreateScope();
+    scope.ServiceProvider.GetRequiredService<HistoryDbContext>().Database.EnsureCreated();
+    if (app.Environment.IsDevelopment())
+    {
+        scope.ServiceProvider.GetRequiredService<CommunityDbContext>().Database.EnsureCreated();
+    }
 }
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    using var scope = app.Services.CreateScope();
-    var communityDb = scope.ServiceProvider.GetRequiredService<CommunityDbContext>();
-    communityDb.Database.EnsureCreated();
-}
-else
+if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
     // The default HSTS value is 30 days.

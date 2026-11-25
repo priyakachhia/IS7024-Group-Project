@@ -37,7 +37,9 @@ public sealed class IndexPageModelTests : IClassFixture<WebApplicationFactory<Pr
         Assert.Equal(
             ["Restaurant", "Coffee Shop", "Retail Store", "Fitness Center"],
             pageModel.SupportedBusinessTypes);
-        Assert.Equal(["Over-the-Rhine", "Oakley"], pageModel.AvailableNeighborhoods.Select(neighborhood => neighborhood.Name));
+        Assert.Equal(
+            CincinnatiNeighborhoods.All.Select(neighborhood => neighborhood.Name),
+            pageModel.AvailableNeighborhoods.Select(neighborhood => neighborhood.Name));
     }
 
     [Fact]
