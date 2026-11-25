@@ -81,6 +81,8 @@ The Community page lets users post and reply in a discussion board for each neig
 
 ## GitHub Project
 
+See [Azure deployment](deploy/README.md) for the App Service and Azure SQL setup.
+
 GitHub Projects will be used to organize and track development throughout the semester.
 
 Project columns:
@@ -288,7 +290,7 @@ As a user, I want to save analyses so that I can access them later.
 
 **Dependencies**
 
-- MySQL database is available.
+- The application database is available.
 
 **Assumptions**
 
@@ -336,7 +338,7 @@ As a user interested in opening a business in a specific neighborhood, I want to
 **Dependencies**
 
 - User accounts are available.
-- MySQL database is available.
+- The application database is available.
 
 **Assumptions**
 
